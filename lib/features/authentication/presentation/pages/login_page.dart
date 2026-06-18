@@ -7,17 +7,17 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey,
-      // appBar: AppBar(
-      //   backgroundColor: const Color.fromARGB(255, 141, 82, 180),
-      //   leading: Icon(Icons.back_hand_sharp),
-      //   title: Center(
-      //     child: Text(
-      //       'Fintech Wallet',
-      //       style: TextStyle(color: Colors.black, fontSize: 24),
-      //     ),
-      //   ),
-      //   actions: [Icon(Icons.back_hand_sharp)],
-      // ),
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 141, 82, 180),
+        leading: Icon(Icons.back_hand_sharp),
+        title: Center(
+          child: Text(
+            'Fintech Wallet',
+            style: TextStyle(color: Colors.black, fontSize: 24),
+          ),
+        ),
+        actions: [Icon(Icons.back_hand_sharp)],
+      ),
       body: Column(
         children: [
           Stack(
@@ -25,9 +25,7 @@ class LoginPage extends StatelessWidget {
               Container(color: Colors.blue, height: 200, width: 500),
               Padding(
                 padding: const EdgeInsets.only(bottom: 40, left: 40),
-                child: Positioned(
-                  child: Icon(Icons.access_alarm),
-                ),
+                child: Positioned(child: Icon(Icons.access_alarm)),
               ),
             ],
           ),
