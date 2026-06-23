@@ -1,42 +1,66 @@
+import 'package:fintech_wallet/features/authentication/presentation/widgets/custom_text_field.dart.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey,
-      appBar: AppBar(
-        // backgroundColor: const Color.fromARGB(255, 141, 82, 180),
-        // leading: Icon(Icons.back_hand_sharp),
-        // title: Center(
-        //   child: Text(
-        //     'Fintech Wallet',
-        //     style: TextStyle(color: Colors.black, fontSize: 24),
-        //   ),
-        // ),
-        // actions: [Icon(Icons.back_hand_sharp)],
-      ),
-      body: Column(
-        children: [
-          Stack(
+      appBar: AppBar(),
+      body: Container(
+        width: 500,
+        color: const Color.fromARGB(255, 211, 210, 212),
+        child: Padding(
+          padding: const EdgeInsets.all(28.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(color: Colors.blue, width: 500),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 40, left: 40),
-                child: Positioned(
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    color: Colors.white,
-                  ),
+              Text(
+                'Nova Pay',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Wellcome back',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Sign in to your account',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Nova Pay',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              ),
+              Form(
+                key: _formKey,
+                child: CustomTextField(
+                  controller: emailController,
+                  label: 'Email',
+                  keyboardType: TextInputType.emailAddress,
+                  prefixIcon: Icons.email,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email is required';
+                    }
+                    return null;
+                  },
                 ),
-                // Icon(Icons.access_alarm)
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
