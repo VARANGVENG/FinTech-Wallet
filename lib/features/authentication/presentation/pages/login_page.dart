@@ -1,5 +1,5 @@
 import 'package:fintech_wallet/features/authentication/presentation/widgets/custom_button.dart';
-import 'package:fintech_wallet/features/authentication/presentation/widgets/custom_text_field.dart.dart';
+import 'package:fintech_wallet/features/authentication/presentation/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
