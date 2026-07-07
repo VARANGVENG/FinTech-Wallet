@@ -1,5 +1,7 @@
-import 'package:fintech_wallet/features/authentication/presentation/widgets/custom_button.dart';
-import 'package:fintech_wallet/features/authentication/presentation/widgets/custom_text_field.dart';
+import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/features/authentication/presentation/pages/register_page.dart';
+import 'package:fintech_wallet/shared/widgets/custom_button.dart';
+import 'package:fintech_wallet/shared/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,11 +22,13 @@ class _LoginPageState extends State<LoginPage> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    print('Email: $email');
-    print('Password: $password');
+    // print('Email: $email');
+    // print('Password: $password');
 
     // TODO: Call API here
   }
+
+  void signinwithgamil() {}
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -32,11 +36,11 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey,
-      appBar: AppBar(),
+      // backgroundColor: AppColors.textPrimary,
+      appBar: AppBar(backgroundColor: AppColors.background),
       body: Container(
-        width: 500,
-        color: const Color.fromARGB(255, 211, 210, 212),
+        width: double.infinity,
+        color: AppColors.background,
         child: Padding(
           padding: const EdgeInsets.all(28.0),
           child: Column(
@@ -44,19 +48,35 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Text(
                 'Nova Pay',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.surface,
+                ),
               ),
               Text(
                 'Wellcome back',
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.surface,
+                ),
               ),
               Text(
                 'Sign in to your account',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.surface,
+                ),
               ),
               Text(
                 'Nova Pay',
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.surface,
+                ),
               ),
               SizedBox(height: 16),
               Form(
@@ -69,7 +89,13 @@ class _LoginPageState extends State<LoginPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Email', style: TextStyle(fontSize: 15)),
+                          Text(
+                            'Email',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: AppColors.surface,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -92,7 +118,13 @@ class _LoginPageState extends State<LoginPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Password', style: TextStyle(fontSize: 15)),
+                          Text(
+                            'Password',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: AppColors.surface,
+                            ),
+                          ),
                           Text(
                             'Forgot?',
                             style: TextStyle(
@@ -117,14 +149,18 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
                     SizedBox(height: 100),
-                    CustomButton(text: 'Sgin in', onPressed: login,),
+                    CustomButton(
+                      textColor: Colors.white,
+                      backgroundColor: AppColors.primary,
+                      text: 'Sgin in',
+                      onPressed: login,
+                    ),
                     SizedBox(height: 20),
                     Row(
                       children: [
                         Expanded(
                           child: Divider(color: Colors.grey, thickness: 1),
                         ),
-
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 40),
                           child: Text(
@@ -135,11 +171,49 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-
                         Expanded(
                           child: Divider(color: Colors.grey, thickness: 1),
                         ),
                       ],
+                    ),
+                    SizedBox(height: 10),
+                    CustomButton(
+                      text: 'Sign in with Email',
+                      onPressed: signinwithgamil,
+                      bordersideColor: Colors.white,
+                    ),
+                    SizedBox(height: 60),
+                    Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Don't have an account?",
+                            style: TextStyle(
+                              color: AppColors.surface,
+                              fontSize: 12,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RegisterPage(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              "Resgiter",
+                              style: TextStyle(
+                                color: const Color.fromARGB(255, 7, 143, 255),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

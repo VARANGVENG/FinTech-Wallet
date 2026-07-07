@@ -1,3 +1,4 @@
+import 'package:fintech_wallet/app/constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -30,7 +31,7 @@ class CustomTextField extends StatelessWidget {
       decoration: InputDecoration(
         // labelText: label,
         hintText: hinText,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+        prefixIcon: Icon(prefixIcon, color: AppColors.surface),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(15)),
         ),

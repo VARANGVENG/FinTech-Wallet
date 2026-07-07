@@ -10,7 +10,8 @@ class AppColors {
   static const warning = Color(0xFFFFAB00);
   static const error = Color(0xFFFF5630);
 
-  static const background = Color(0xFFF4F5F7);
+  // static const background = Color(0xFFF4F5F7);
+    static const background =Color.fromARGB(255, 7, 22, 49);
   static const surface = Colors.white;
 
   static const textPrimary = Color(0xFF172B4D);

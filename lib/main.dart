@@ -1,4 +1,4 @@
-import 'package:fintech_wallet/features/authentication/presentation/pages/login_page.dart';
+import 'package:fintech_wallet/features/dashboard/presentation/page/home_dashboard.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginPage()
+      home: const HomeDashboard(),
     );
   }
 }
