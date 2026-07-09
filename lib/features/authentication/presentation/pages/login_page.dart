@@ -19,8 +19,8 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
+    // final email = emailController.text.trim();
+    // final password = passwordController.text.trim();
 
     // print('Email: $email');
     // print('Password: $password');
