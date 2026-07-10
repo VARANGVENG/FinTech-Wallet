@@ -1,7 +1,7 @@
 import 'package:fintech_wallet/app/constants.dart';
-import 'package:fintech_wallet/features/authentication/presentation/pages/login_page.dart';
-import 'package:fintech_wallet/features/authentication/presentation/pages/register_page.dart';
-import 'package:fintech_wallet/shared/widgets/custome_menu_item.dart';
+import 'package:fintech_wallet/core/mock/mock_transaction_history.dart';
+import 'package:fintech_wallet/shared/widgets/custom_transaction_history_item.dart';
+import 'package:fintech_wallet/shared/widgets/custome_quick%20actions_item.dart';
 import 'package:flutter/material.dart';
 
 class HomeDashboard extends StatefulWidget {
@@ -22,18 +22,9 @@ class _HomeDashboardState extends State<HomeDashboard> {
         // height: 200,
         color: AppColors.background,
         child: Padding(
-          padding: const EdgeInsets.all(28.0),
+          padding: const EdgeInsets.only(left: 20, right: 20),
           child: Column(
             children: [
-              // InkWell(
-              //   borderRadius: BorderRadius.circular(100),
-              //   onTap: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(builder: (context) => LoginPage()),
-              //     );
-              //   },
-              // ),
               Row(
                 children: [
                   CircleAvatar(radius: 25),
@@ -176,7 +167,27 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   ),
                 ],
               ),
-              
+              SizedBox(height: 20),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1B2338),
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: ListView.separated(
+                    // shrinkWrap: true,
+                    // physics: const NeverScrollableScrollPhysics(),
+                    itemCount: transactionHistory.length,
+                    separatorBuilder: (_, __) =>
+                        const Divider(height: 1, thickness: 0.5),
+                    itemBuilder: (context, index) {
+                      return CustomTransactionHistoryItem(
+                        transaction: transactionHistory[index],
+                      );
+                    },
+                  ),
+                ),
+              ),
             ],
           ),
         ),
