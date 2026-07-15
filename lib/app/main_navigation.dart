@@ -17,7 +17,9 @@ class _MainNavigationState extends State<MainNavigation> {
     // TODO: implement initState
     super.initState();
 
-    page = [HomeDashboard()];
+    page = [HomeDashboard()
+    
+    ];
   }
 
   void changePage(int index) {
