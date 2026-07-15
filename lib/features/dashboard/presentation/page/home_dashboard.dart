@@ -1,7 +1,8 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/core/mock/mock_transaction_history.dart';
+import 'package:fintech_wallet/shared/widgets/custom_card.dart';
 import 'package:fintech_wallet/shared/widgets/custom_transaction_history_item.dart';
-import 'package:fintech_wallet/shared/widgets/custome_quick%20actions_item.dart';
+import 'package:fintech_wallet/shared/widgets/custome_quick_actions_item.dart';
 import 'package:flutter/material.dart';
 
 class HomeDashboard extends StatefulWidget {
@@ -59,66 +60,11 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 ],
               ),
               SizedBox(height: 25),
-              Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 170,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(22.0),
-                      child: Column(
-                        // mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Total Balance',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 18,
-                              color: AppColors.surface,
-                            ),
-                          ),
-                          Text(
-                            '\$12,450.75,',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 35,
-                              color: AppColors.surface,
-                            ),
-                          ),
-                          Spacer(),
-                          Row(
-                            children: [
-                              Text(
-                                'Available',
-                                style: TextStyle(color: AppColors.surface),
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                '\$9,850.20',
-                                style: TextStyle(color: AppColors.surface),
-                              ),
-                              Spacer(),
-                              Text(
-                                'Pending',
-                                style: TextStyle(color: AppColors.surface),
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                '\$2600.55',
-                                style: TextStyle(color: AppColors.surface),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+              CustomCard(
+                balanceType: 'Total Balance',
+                totalBalance: 12450.75,
+                availableBalance: 9850.20,
+                pendingBalance: 2600.55,
               ),
               SizedBox(height: 25),
               Row(
