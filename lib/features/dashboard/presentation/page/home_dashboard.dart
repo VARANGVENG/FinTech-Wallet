@@ -167,19 +167,26 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 18),
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFF1B2338),
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
                   ),
                   child: ListView.separated(
                     // shrinkWrap: true,
                     // physics: const NeverScrollableScrollPhysics(),
                     itemCount: transactionHistory.length,
-                    separatorBuilder: (_, __) =>
-                        const Divider(height: 1, thickness: 0.5),
+                    separatorBuilder: (_, __) => const Divider(
+                      height: 3,
+                      indent: 10,
+                      endIndent: 10,
+                      thickness: 0.5,
+                    ),
                     itemBuilder: (context, index) {
                       return CustomTransactionHistoryItem(
                         transaction: transactionHistory[index],

@@ -14,7 +14,7 @@ class CustomTransactionHistoryItem extends StatelessWidget {
         // Navigate to transaction detail page
       },
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 26, vertical: 5),
         leading: CircleAvatar(
           radius: 24,
           backgroundColor: AppColors.primary.withOpacity(0.1),
