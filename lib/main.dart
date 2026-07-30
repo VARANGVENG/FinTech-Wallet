@@ -1,8 +1,11 @@
+import 'package:fintech_wallet/app/main_navigation.dart';
+import 'package:fintech_wallet/features/authentication/presentation/pages/login_page.dart';
 import 'package:fintech_wallet/features/dashboard/presentation/page/home_dashboard.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -13,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const HomeDashboard(),
+      home: const MainNavigation(),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:fintech_wallet/features/dashboard/presentation/model/transaction_history_model.dart';
 import 'package:flutter/material.dart';
 
+/// Mock data for Recent Activity / transaction history lists.
+/// Swap this out for a real API/repository call once the backend is ready.
 final List<TransactionHistoryModel> transactionHistory = [
   TransactionHistoryModel(
     id: 'TXN001',
@@ -11,6 +13,7 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.local_cafe,
     amountColor: Colors.red,
     isIncome: false,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -22,6 +25,7 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.account_balance_wallet,
     amountColor: Colors.green,
     isIncome: true,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -33,6 +37,54 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.movie,
     amountColor: Colors.red,
     isIncome: false,
+    status: TransactionStatus.completed,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN004',
+    title: 'Hotel Reservation',
+    description: 'Booking Payment',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -340.00,
+    icon: Icons.hotel,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN005',
+    title: 'Apple One',
+    description: 'Subscription',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -26.95,
+    icon: Icons.apple,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN006',
+    title: 'Amazon Marketplace',
+    description: 'Online Purchase',
+    transactionDate: DateTime(2025, 5, 28),
+    amount: -58.99,
+    icon: Icons.shopping_bag,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.completed,
+  ),
+  TransactionHistoryModel(
+    id: 'TXN001',
+    title: 'Starbucks Coffee',
+    description: 'Coffee Payment',
+    transactionDate: DateTime.now(),
+    amount: -5.45,
+    icon: Icons.local_cafe,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -44,6 +96,7 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.account_balance_wallet,
     amountColor: Colors.green,
     isIncome: true,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -55,6 +108,54 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.movie,
     amountColor: Colors.red,
     isIncome: false,
+    status: TransactionStatus.completed,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN004',
+    title: 'Hotel Reservation',
+    description: 'Booking Payment',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -340.00,
+    icon: Icons.hotel,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN005',
+    title: 'Apple One',
+    description: 'Subscription',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -26.95,
+    icon: Icons.apple,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN006',
+    title: 'Amazon Marketplace',
+    description: 'Online Purchase',
+    transactionDate: DateTime(2025, 5, 28),
+    amount: -58.99,
+    icon: Icons.shopping_bag,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.completed,
+  ),
+  TransactionHistoryModel(
+    id: 'TXN001',
+    title: 'Starbucks Coffee',
+    description: 'Coffee Payment',
+    transactionDate: DateTime.now(),
+    amount: -5.45,
+    icon: Icons.local_cafe,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -66,6 +167,7 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.account_balance_wallet,
     amountColor: Colors.green,
     isIncome: true,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -77,6 +179,54 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.movie,
     amountColor: Colors.red,
     isIncome: false,
+    status: TransactionStatus.completed,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN004',
+    title: 'Hotel Reservation',
+    description: 'Booking Payment',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -340.00,
+    icon: Icons.hotel,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN005',
+    title: 'Apple One',
+    description: 'Subscription',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -26.95,
+    icon: Icons.apple,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN006',
+    title: 'Amazon Marketplace',
+    description: 'Online Purchase',
+    transactionDate: DateTime(2025, 5, 28),
+    amount: -58.99,
+    icon: Icons.shopping_bag,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.completed,
+  ),
+  TransactionHistoryModel(
+    id: 'TXN001',
+    title: 'Starbucks Coffee',
+    description: 'Coffee Payment',
+    transactionDate: DateTime.now(),
+    amount: -5.45,
+    icon: Icons.local_cafe,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -88,6 +238,7 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.account_balance_wallet,
     amountColor: Colors.green,
     isIncome: true,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -99,6 +250,54 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.movie,
     amountColor: Colors.red,
     isIncome: false,
+    status: TransactionStatus.completed,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN004',
+    title: 'Hotel Reservation',
+    description: 'Booking Payment',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -340.00,
+    icon: Icons.hotel,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN005',
+    title: 'Apple One',
+    description: 'Subscription',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -26.95,
+    icon: Icons.apple,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN006',
+    title: 'Amazon Marketplace',
+    description: 'Online Purchase',
+    transactionDate: DateTime(2025, 5, 28),
+    amount: -58.99,
+    icon: Icons.shopping_bag,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.completed,
+  ),
+  TransactionHistoryModel(
+    id: 'TXN001',
+    title: 'Starbucks Coffee',
+    description: 'Coffee Payment',
+    transactionDate: DateTime.now(),
+    amount: -5.45,
+    icon: Icons.local_cafe,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -110,6 +309,7 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.account_balance_wallet,
     amountColor: Colors.green,
     isIncome: true,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -121,6 +321,54 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.movie,
     amountColor: Colors.red,
     isIncome: false,
+    status: TransactionStatus.completed,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN004',
+    title: 'Hotel Reservation',
+    description: 'Booking Payment',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -340.00,
+    icon: Icons.hotel,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN005',
+    title: 'Apple One',
+    description: 'Subscription',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -26.95,
+    icon: Icons.apple,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN006',
+    title: 'Amazon Marketplace',
+    description: 'Online Purchase',
+    transactionDate: DateTime(2025, 5, 28),
+    amount: -58.99,
+    icon: Icons.shopping_bag,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.completed,
+  ),
+  TransactionHistoryModel(
+    id: 'TXN001',
+    title: 'Starbucks Coffee',
+    description: 'Coffee Payment',
+    transactionDate: DateTime.now(),
+    amount: -5.45,
+    icon: Icons.local_cafe,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -132,6 +380,7 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.account_balance_wallet,
     amountColor: Colors.green,
     isIncome: true,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
@@ -143,201 +392,42 @@ final List<TransactionHistoryModel> transactionHistory = [
     icon: Icons.movie,
     amountColor: Colors.red,
     isIncome: false,
+    status: TransactionStatus.completed,
   ),
 
   TransactionHistoryModel(
-    id: 'TXN002',
-    title: 'Salary',
-    description: 'Monthly Salary',
+    id: 'TXN004',
+    title: 'Hotel Reservation',
+    description: 'Booking Payment',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -340.00,
+    icon: Icons.hotel,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN005',
+    title: 'Apple One',
+    description: 'Subscription',
+    transactionDate: DateTime(2025, 5, 29),
+    amount: -26.95,
+    icon: Icons.apple,
+    amountColor: Colors.red,
+    isIncome: false,
+    status: TransactionStatus.pending,
+  ),
+
+  TransactionHistoryModel(
+    id: 'TXN006',
+    title: 'Amazon Marketplace',
+    description: 'Online Purchase',
     transactionDate: DateTime(2025, 5, 28),
-    amount: 3200.00,
-    icon: Icons.account_balance_wallet,
-    amountColor: Colors.green,
-    isIncome: true,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN003',
-    title: 'Netflix',
-    description: 'Subscription',
-    transactionDate: DateTime(2025, 5, 20),
-    amount: -15.99,
-    icon: Icons.movie,
+    amount: -58.99,
+    icon: Icons.shopping_bag,
     amountColor: Colors.red,
     isIncome: false,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN002',
-    title: 'Salary',
-    description: 'Monthly Salary',
-    transactionDate: DateTime(2025, 5, 28),
-    amount: 3200.00,
-    icon: Icons.account_balance_wallet,
-    amountColor: Colors.green,
-    isIncome: true,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN003',
-    title: 'Netflix',
-    description: 'Subscription',
-    transactionDate: DateTime(2025, 5, 20),
-    amount: -15.99,
-    icon: Icons.movie,
-    amountColor: Colors.red,
-    isIncome: false,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN002',
-    title: 'Salary',
-    description: 'Monthly Salary',
-    transactionDate: DateTime(2025, 5, 28),
-    amount: 3200.00,
-    icon: Icons.account_balance_wallet,
-    amountColor: Colors.green,
-    isIncome: true,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN003',
-    title: 'Netflix',
-    description: 'Subscription',
-    transactionDate: DateTime(2025, 5, 20),
-    amount: -15.99,
-    icon: Icons.movie,
-    amountColor: Colors.red,
-    isIncome: false,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN002',
-    title: 'Salary',
-    description: 'Monthly Salary',
-    transactionDate: DateTime(2025, 5, 28),
-    amount: 3200.00,
-    icon: Icons.account_balance_wallet,
-    amountColor: Colors.green,
-    isIncome: true,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN003',
-    title: 'Netflix',
-    description: 'Subscription',
-    transactionDate: DateTime(2025, 5, 20),
-    amount: -15.99,
-    icon: Icons.movie,
-    amountColor: Colors.red,
-    isIncome: false,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN002',
-    title: 'Salary',
-    description: 'Monthly Salary',
-    transactionDate: DateTime(2025, 5, 28),
-    amount: 3200.00,
-    icon: Icons.account_balance_wallet,
-    amountColor: Colors.green,
-    isIncome: true,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN003',
-    title: 'Netflix',
-    description: 'Subscription',
-    transactionDate: DateTime(2025, 5, 20),
-    amount: -15.99,
-    icon: Icons.movie,
-    amountColor: Colors.red,
-    isIncome: false,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN002',
-    title: 'Salary',
-    description: 'Monthly Salary',
-    transactionDate: DateTime(2025, 5, 28),
-    amount: 3200.00,
-    icon: Icons.account_balance_wallet,
-    amountColor: Colors.green,
-    isIncome: true,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN003',
-    title: 'Netflix',
-    description: 'Subscription',
-    transactionDate: DateTime(2025, 5, 20),
-    amount: -15.99,
-    icon: Icons.movie,
-    amountColor: Colors.red,
-    isIncome: false,
-  ),
-  TransactionHistoryModel(
-    id: 'TXN002',
-    title: 'Salary',
-    description: 'Monthly Salary',
-    transactionDate: DateTime(2025, 5, 28),
-    amount: 3200.00,
-    icon: Icons.account_balance_wallet,
-    amountColor: Colors.green,
-    isIncome: true,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN003',
-    title: 'Netflix',
-    description: 'Subscription',
-    transactionDate: DateTime(2025, 5, 20),
-    amount: -15.99,
-    icon: Icons.movie,
-    amountColor: Colors.red,
-    isIncome: false,
-  ),
-  TransactionHistoryModel(
-    id: 'TXN002',
-    title: 'Salary',
-    description: 'Monthly Salary',
-    transactionDate: DateTime(2025, 5, 28),
-    amount: 3200.00,
-    icon: Icons.account_balance_wallet,
-    amountColor: Colors.green,
-    isIncome: true,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN003',
-    title: 'Netflix',
-    description: 'Subscription',
-    transactionDate: DateTime(2025, 5, 20),
-    amount: -15.99,
-    icon: Icons.movie,
-    amountColor: Colors.red,
-    isIncome: false,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN002',
-    title: 'Salary',
-    description: 'Monthly Salary',
-    transactionDate: DateTime(2025, 5, 28),
-    amount: 3200.00,
-    icon: Icons.account_balance_wallet,
-    amountColor: Colors.green,
-    isIncome: true,
-  ),
-
-  TransactionHistoryModel(
-    id: 'TXN003',
-    title: 'Netflix',
-    description: 'Subscription',
-    transactionDate: DateTime(2025, 5, 20),
-    amount: -15.99,
-    icon: Icons.movie,
-    amountColor: Colors.red,
-    isIncome: false,
+    status: TransactionStatus.completed,
   ),
 ];

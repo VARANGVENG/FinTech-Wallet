@@ -5,14 +5,14 @@ import 'package:fintech_wallet/shared/widgets/custom_transaction_history_item.da
 import 'package:fintech_wallet/shared/widgets/custome_quick_actions_item.dart';
 import 'package:flutter/material.dart';
 
-class HomeDashboard extends StatefulWidget {
-  const HomeDashboard({super.key});
+class WalletPage extends StatefulWidget {
+  const WalletPage({super.key});
 
   @override
-  State<HomeDashboard> createState() => _HomeDashboardState();
+  State<WalletPage> createState() => _WalletPageState();
 }
 
-class _HomeDashboardState extends State<HomeDashboard> {
+class _WalletPageState extends State<WalletPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,13 +28,14 @@ class _HomeDashboardState extends State<HomeDashboard> {
             children: [
               Row(
                 children: [
-                  CircleAvatar(radius: 25),
+                  // CircleAvatar(radius: 25),
                   SizedBox(width: 10),
                   Text(
-                    'Hello, Alex',
+                    'My Walllet',
                     style: TextStyle(
                       color: AppColors.surface,
                       fontWeight: FontWeight.w900,
+                      fontSize: 25,
                     ),
                   ),
                   Spacer(),
@@ -61,7 +62,9 @@ class _HomeDashboardState extends State<HomeDashboard> {
               ),
               SizedBox(height: 25),
               CustomCard(
-                balanceType: 'Total Balance',
+                balanceType: 'Nova Pay Wallet',
+                cardType: 'Visa',
+                cardNumber: '**** **** **** 1234',
                 totalBalance: 12450.75,
                 availableBalance: 9850.20,
                 pendingBalance: 2600.55,
@@ -76,19 +79,19 @@ class _HomeDashboardState extends State<HomeDashboard> {
                     itemText: 'Top up',
                   ),
                   CustomMenuItem(
-                    icon: Icons.call_made,
+                    icon: Icons.arrow_downward,
                     iconColor: AppColors.primary,
-                    itemText: 'Transfer',
+                    itemText: 'Withdraw',
                   ),
                   CustomMenuItem(
-                    icon: Icons.qr_code_scanner,
+                    icon: Icons.credit_card,
                     iconColor: AppColors.primary,
-                    itemText: 'Scan',
+                    itemText: 'Card',
                   ),
                   CustomMenuItem(
-                    icon: Icons.more_horiz,
+                    icon: Icons.history,
                     iconColor: AppColors.primary,
-                    itemText: 'More',
+                    itemText: 'History',
                   ),
                 ],
               ),
@@ -96,7 +99,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
               Row(
                 children: [
                   Text(
-                    'Recent Activity',
+                    'Transaction History',
 
                     style: TextStyle(
                       color: AppColors.surface,

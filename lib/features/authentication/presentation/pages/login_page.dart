@@ -3,30 +3,64 @@ import 'package:fintech_wallet/features/authentication/presentation/pages/regist
 import 'package:fintech_wallet/shared/widgets/custom_button.dart';
 import 'package:fintech_wallet/shared/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginPage extends StatefulWidget {
+import '../providers/auth_provider.dart';
+
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  @override
+  void initState() {
+    super.initState();
+    ref.listenManual<AuthState>(authProvider, (previous, next) {
+      if (next.status == AuthStatus.success) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Login successful')));
 
-  void login() {
+        // Navigator.pushReplacement(...);
+      }
+
+      if (next.status == AuthStatus.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.errorMessage ?? 'Login failed')),
+        );
+      }
+    });
+  }
+
+  Future<void> login() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    // final email = emailController.text.trim();
-    // final password = passwordController.text.trim();
-
-    // print('Email: $email');
-    // print('Password: $password');
-
-    // TODO: Call API here
+    await ref
+        .read(authProvider.notifier)
+        .login(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
   }
+  // void login() {
+  //   if (!_formKey.currentState!.validate()) {
+  //     return;
+  //   }
+
+  //   // final email = emailController.text.trim();
+  //   // final password = passwordController.text.trim();
+
+  //   // print('Email: $email');
+  //   // print('Password: $password');
+
+  //   // TODO: Call API here
+  // }
 
   void signinwithgamil() {}
 
@@ -35,6 +69,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
     return Scaffold(
       // backgroundColor: AppColors.textPrimary,
       appBar: AppBar(backgroundColor: AppColors.background),
@@ -125,13 +160,21 @@ class _LoginPageState extends State<LoginPage> {
                               color: AppColors.surface,
                             ),
                           ),
-                          Text(
-                            'Forgot?',
-                            style: TextStyle(
-                              color: const Color.fromARGB(255, 7, 143, 255),
-                              fontWeight: FontWeight.bold,
+                          // Text(
+                          //   'Forgot?',
+                          //   style: TextStyle(
+                          //     color: const Color.fromARGB(255, 7, 143, 255),
+                          //     fontWeight: FontWeight.bold,
+                          //   ),
+                          // ),
+                          if (authState.status == AuthStatus.error)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(
+                                authState.errorMessage ?? "",
+                                style: const TextStyle(color: Colors.red),
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -152,8 +195,12 @@ class _LoginPageState extends State<LoginPage> {
                     CustomButton(
                       textColor: Colors.white,
                       backgroundColor: AppColors.primary,
-                      text: 'Sgin in',
-                      onPressed: login,
+                      text: authState.status == AuthStatus.loading
+                          ? "Signing in..."
+                          : "Sign in",
+                      onPressed: authState.status == AuthStatus.loading
+                          ? null
+                          : login,
                     ),
                     SizedBox(height: 20),
                     Row(
