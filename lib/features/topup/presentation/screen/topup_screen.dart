@@ -3,45 +3,44 @@ import 'package:fintech_wallet/features/topup/presentation/widget/amount_input_c
 import 'package:fintech_wallet/features/topup/presentation/widget/payment_method_tile.dart';
 import 'package:fintech_wallet/features/topup/presentation/widget/primary_button.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../provider/topup_provider.dart';
 
-
-/// The screen is now a `StatelessWidget`. It no longer owns any mutable
-/// state itself (no `_amount`, no `_methods`, no `setState`) — all of that
-/// moved into `TopUpProvider`. The screen's only jobs are: (1) trigger the
-/// initial load once, and (2) render whatever `TopUpProvider` currently
-/// holds. `ChangeNotifierProvider` is placed above this screen (see
-/// `main.dart`), so `context.watch<TopUpProvider>()` below can find it.
-class TopUpScreen extends StatefulWidget {
+/// `ConsumerStatefulWidget` is Riverpod's stateful widget variant — this
+/// screen still owns no mutable state of its own (no `_amount`, no
+/// `setState`); all of that lives in `TopUpState`/`TopUpNotifier`.
+/// `ref.watch(topUpProvider)` in `build` plays the same role
+/// `context.watch<TopUpProvider>()` used to.
+class TopUpScreen extends ConsumerStatefulWidget {
   const TopUpScreen({super.key});
 
   @override
-  State<TopUpScreen> createState() => _TopUpScreenState();
+  ConsumerState<TopUpScreen> createState() => _TopUpScreenState();
 }
 
-class _TopUpScreenState extends State<TopUpScreen> {
+class _TopUpScreenState extends ConsumerState<TopUpScreen> {
   @override
   void initState() {
     super.initState();
-    // `listen: false` here because we're only calling a method, not
-    // reading data to build the UI with — reading with `listen: true`
-    // inside `initState` would throw, since the widget isn't in the tree yet.
+    // `ref.read` here, not `ref.watch` — same reasoning as before: this
+    // calls a method once, it doesn't need to subscribe this widget to
+    // future state changes.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TopUpProvider>().loadPaymentMethods();
+      ref.read(topUpProvider.notifier).loadPaymentMethods();
     });
   }
 
   Future<void> _handleReviewTopUp(BuildContext context) async {
-    final provider = context.read<TopUpProvider>();
-    final result = await provider.submit();
+    final notifier = ref.read(topUpProvider.notifier);
+    final result = await notifier.submit();
     if (!context.mounted || result == null) return;
 
+    final amount = ref.read(topUpProvider).amount;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           result.success
-              ? 'Reviewing top-up of \$${provider.amount.toStringAsFixed(2)}'
+              ? 'Reviewing top-up of \$${amount.toStringAsFixed(2)}'
               : result.message ?? 'Something went wrong.',
         ),
       ),
@@ -50,11 +49,12 @@ class _TopUpScreenState extends State<TopUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // `context.watch` subscribes this widget to `TopUpProvider` — whenever
-    // the provider calls `notifyListeners()`, this `build` method re-runs
-    // automatically. This one line is the entire replacement for every
-    // `setState(() { ... })` call the previous version had.
-    final provider = context.watch<TopUpProvider>();
+    // `ref.watch` subscribes this widget to `topUpProvider` — whenever
+    // `TopUpNotifier` sets a new `state`, this `build` re-runs automatically.
+    final state = ref.watch(topUpProvider);
+    // `ref.read` for the notifier itself is fine even inside `build` — we're
+    // not watching it (it never changes identity), just calling methods on it.
+    final notifier = ref.read(topUpProvider.notifier);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -63,7 +63,10 @@ class _TopUpScreenState extends State<TopUpScreen> {
         elevation: 0,
         centerTitle: true,
         leading: const BackButton(color: Colors.white),
-        title: const Text('Top-up', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        title: const Text(
+          'Top-up',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -72,51 +75,69 @@ class _TopUpScreenState extends State<TopUpScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AmountInputCard(
-                amount: provider.amount,
-                currency: provider.currency,
-                quickAmounts: TopUpProvider.quickAmounts,
-                onQuickAmountSelected: provider.selectQuickAmount,
+                amount: state.amount,
+                currency: state.currency,
+                quickAmounts: TopUpNotifier.quickAmounts,
+                onQuickAmountSelected: notifier.selectQuickAmount,
                 onCurrencyTap: (_) {},
               ),
               const SizedBox(height: 28),
               const Text(
                 'Choose Method',
-                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: 16),
-              if (provider.loadingMethods)
+              if (state.loadingMethods)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Center(child: CircularProgressIndicator(color: AppColors.accentBlue)),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.accentBlue,
+                    ),
+                  ),
                 )
-              else if (provider.errorMessage != null)
+              else if (state.errorMessage != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24),
                   child: Center(
                     child: Column(
                       children: [
-                        Text(provider.errorMessage!, style: const TextStyle(color: AppColors.textSecondary)),
+                        Text(
+                          state.errorMessage!,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
                         TextButton(
-                          onPressed: provider.loadPaymentMethods,
-                          child: const Text('Retry', style: TextStyle(color: AppColors.accentBlue)),
+                          onPressed: notifier.loadPaymentMethods,
+                          child: const Text(
+                            'Retry',
+                            style: TextStyle(color: AppColors.accentBlue),
+                          ),
                         ),
                       ],
                     ),
                   ),
                 )
               else
-                ...provider.methods.map(
+                ...state.methods.map(
                   (method) => PaymentMethodTile(
                     method: method,
-                    selected: provider.selectedMethod == method.type,
-                    onSelect: () => provider.selectMethod(method.type),
+                    selected: state.selectedMethod == method.type,
+                    onSelect: () => notifier.selectMethod(method.type),
                   ),
                 ),
               const SizedBox(height: 12),
               PrimaryButton(
                 label: 'Review Top-up',
-                isLoading: provider.submitting,
-                onPressed: provider.selectedMethod == null ? null : () => _handleReviewTopUp(context),
+                isLoading: state.submitting,
+                onPressed: state.selectedMethod == null
+                    ? null
+                    : () => _handleReviewTopUp(context),
               ),
               const SizedBox(height: 12),
               const Center(
@@ -125,7 +146,13 @@ class _TopUpScreenState extends State<TopUpScreen> {
                   children: [
                     Icon(Icons.lock, size: 14, color: AppColors.textSecondary),
                     SizedBox(width: 6),
-                    Text('Secured & encrypted', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                    Text(
+                      'Secured & encrypted',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
                   ],
                 ),
               ),

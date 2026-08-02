@@ -1,102 +1,120 @@
+import 'package:fintech_wallet/core/network/api_endpoints.dart';
 import 'package:fintech_wallet/features/topup/data/datasource/topup_remote_datasurce.dart';
 import 'package:fintech_wallet/features/topup/data/repositories/topup_respositories_Imp.dart';
 import 'package:fintech_wallet/features/topup/data/model/payment_method.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/repositories/topup_repository.dart';
-// import '../data/datasources/topup_remote_data_source.dart';
-// import '../data/repositories/topup_repository_impl.dart';
-// import '../domain/repositories/topup_repository.dart';
-// import '../models/payment_method.dart';
 
-/// The top of the stack: `Screen -> Provider -> Repository -> RemoteDataSource`.
-///
-/// `TopUpProvider` is a `ChangeNotifier` — it holds every piece of mutable
-/// UI state for the Top-up screen (amount, selected method, loading/error
-/// flags) and calls `notifyListeners()` whenever that state changes. The
-/// widget tree listens via `context.watch<TopUpProvider>()` and rebuilds
-/// automatically — this is what replaces the screen's own `setState` calls
-/// from the previous version.
-///
-/// Crucially, this class only ever imports [TopUpRepository] (the abstract
-/// contract), never [TopUpRepositoryImpl] or the remote data source
-/// directly. That's what makes `TopUpProvider(FakeTopUpRepository())`
-/// possible in a widget test with zero changes to this file.
-class TopUpProvider extends ChangeNotifier {
+/// Immutable snapshot of everything the Top-up screen needs to render.
+/// Replaced wholesale via [copyWith] rather than mutated in place — this is
+/// the same convention `AuthState` already uses, so there's one way to
+/// represent "feature state" across the app, not two.
+class TopUpState {
+  final double amount;
+  final String currency;
+  final PaymentMethodType? selectedMethod;
+  final List<PaymentMethod> methods;
+  final bool loadingMethods;
+  final bool submitting;
+  final String? errorMessage;
+
+  const TopUpState({
+    this.amount = 100.0,
+    this.currency = 'USD',
+    this.selectedMethod = PaymentMethodType.linkedBank,
+    this.methods = const [],
+    this.loadingMethods = true,
+    this.submitting = false,
+    this.errorMessage,
+  });
+
+  TopUpState copyWith({
+    double? amount,
+    String? currency,
+    PaymentMethodType? selectedMethod,
+    List<PaymentMethod>? methods,
+    bool? loadingMethods,
+    bool? submitting,
+    String? errorMessage,
+  }) {
+    return TopUpState(
+      amount: amount ?? this.amount,
+      currency: currency ?? this.currency,
+      selectedMethod: selectedMethod ?? this.selectedMethod,
+      methods: methods ?? this.methods,
+      loadingMethods: loadingMethods ?? this.loadingMethods,
+      submitting: submitting ?? this.submitting,
+      // Matches AuthState's copyWith: errorMessage is NOT preserved with
+      // `??` like the other fields — any call that doesn't explicitly pass
+      // it resets it to null. See the note below the code for why.
+      errorMessage: errorMessage,
+    );
+  }
+}
+
+/// Same four operations `TopUpProvider` (the old `ChangeNotifier`) had —
+/// only the mechanism for announcing a change is different (`state =` here,
+/// `notifyListeners()` there). The domain/data layers below this class are
+/// completely unchanged.
+class TopUpNotifier extends StateNotifier<TopUpState> {
   final TopUpRepository _repository;
 
-  TopUpProvider(this._repository);
+  TopUpNotifier(this._repository) : super(const TopUpState());
 
   static const quickAmounts = [25.0, 50.0, 100.0, 250.0];
 
-  double amount = 100.0;
-  String currency = 'USD';
-  PaymentMethodType? selectedMethod = PaymentMethodType.linkedBank;
-
-  List<PaymentMethod> methods = [];
-  bool loadingMethods = true;
-  bool submitting = false;
-  String? errorMessage;
-
-  /// Called once from the screen's `initState`. Kept as an explicit method
-  /// — rather than firing automatically in the constructor — so the screen
-  /// controls exactly when loading starts.
   Future<void> loadPaymentMethods() async {
-    loadingMethods = true;
-    errorMessage = null;
-    notifyListeners();
+    state = state.copyWith(loadingMethods: true, errorMessage: null);
 
     try {
-      methods = await _repository.getPaymentMethods();
+      final methods = await _repository.getPaymentMethods();
+      state = state.copyWith(methods: methods, loadingMethods: false);
     } catch (e) {
-      // The provider is where a thrown exception finally becomes a
-      // human-readable string for the UI — neither the repository nor the
-      // data source below it deal in user-facing copy.
-      errorMessage = 'Could not load payment methods.';
-    } finally {
-      loadingMethods = false;
-      notifyListeners();
+      state = state.copyWith(
+        loadingMethods: false,
+        errorMessage: 'Could not load payment methods.',
+      );
     }
   }
 
   void selectQuickAmount(double value) {
-    amount = value;
-    notifyListeners();
+    state = state.copyWith(amount: value);
   }
 
   void selectMethod(PaymentMethodType type) {
-    selectedMethod = type;
-    notifyListeners();
+    state = state.copyWith(selectedMethod: type);
   }
 
-  /// Returns the result so the screen can decide what to do next (show a
-  /// snackbar, navigate, etc.) — the provider itself never triggers
-  /// navigation or shows UI, keeping it testable without a `BuildContext`.
   Future<TopUpResult?> submit() async {
-    if (selectedMethod == null) return null;
+    if (state.selectedMethod == null) return null;
 
-    submitting = true;
-    notifyListeners();
+    state = state.copyWith(submitting: true);
 
     try {
       final result = await _repository.submitTopUp(
-        amount: amount,
-        currency: currency,
-        method: selectedMethod!,
+        amount: state.amount,
+        currency: state.currency,
+        method: state.selectedMethod!,
       );
       return result;
     } catch (e) {
       return const TopUpResult(success: false, message: 'Something went wrong.');
     } finally {
-      submitting = false;
-      notifyListeners();
+      state = state.copyWith(submitting: false);
     }
   }
 }
 
-/// Convenience factory so `main.dart` can build a fully-wired provider in
-/// one line: `ChangeNotifierProvider(create: (_) => buildTopUpProvider(...))`.
-TopUpProvider buildTopUpProvider({required String baseUrl}) {
-  final dataSource = HttpTopUpRemoteDataSource(baseUrl: baseUrl);
-  final repository = TopUpRepositoryImpl(dataSource);
-  return TopUpProvider(repository);
-}
+/// Builds the repository this feature depends on. Kept as its own provider
+/// (rather than constructed inline inside `topUpProvider`) so a test could
+/// override just this one piece — e.g. `topUpRepositoryProvider.overrideWithValue(FakeTopUpRepository())`
+/// — without touching `TopUpNotifier` at all.
+final topUpRepositoryProvider = Provider<TopUpRepository>((ref) {
+  final dataSource = HttpTopUpRemoteDataSource(baseUrl: ApiEndpoints.baseUrl);
+  return TopUpRepositoryImpl(dataSource);
+});
+
+final topUpProvider = StateNotifierProvider<TopUpNotifier, TopUpState>((ref) {
+  final repository = ref.watch(topUpRepositoryProvider);
+  return TopUpNotifier(repository);
+});
