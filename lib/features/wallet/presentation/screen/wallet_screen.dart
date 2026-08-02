@@ -5,14 +5,14 @@ import 'package:fintech_wallet/shared/widgets/custom_transaction_history_item.da
 import 'package:fintech_wallet/shared/widgets/custome_quick_actions_item.dart';
 import 'package:flutter/material.dart';
 
-class WalletPage extends StatefulWidget {
-  const WalletPage({super.key});
+class WalletScreen extends StatefulWidget {
+  const WalletScreen({super.key});
 
   @override
-  State<WalletPage> createState() => _WalletPageState();
+  State<WalletScreen> createState() => _WalletPageState();
 }
 
-class _WalletPageState extends State<WalletPage> {
+class _WalletPageState extends State<WalletScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

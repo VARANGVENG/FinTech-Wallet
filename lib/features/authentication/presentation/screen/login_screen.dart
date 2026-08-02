@@ -1,5 +1,5 @@
 import 'package:fintech_wallet/app/constants.dart';
-import 'package:fintech_wallet/features/authentication/presentation/pages/register_page.dart';
+import 'package:fintech_wallet/features/authentication/presentation/screen/register_screen.dart';
 import 'package:fintech_wallet/shared/widgets/custom_button.dart';
 import 'package:fintech_wallet/shared/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
@@ -7,14 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/auth_provider.dart';
 
-class LoginPage extends ConsumerStatefulWidget {
-  const LoginPage({super.key});
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  ConsumerState<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginScreen> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
@@ -247,7 +247,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => RegisterPage(),
+                                  builder: (context) => RegisterScreen(),
                                 ),
                               );
                             },

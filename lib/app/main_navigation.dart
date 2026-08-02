@@ -1,5 +1,5 @@
-import 'package:fintech_wallet/features/dashboard/presentation/page/home_dashboard_page.dart';
-import 'package:fintech_wallet/features/wallet/presentation/page/wallet_page.dart';
+import 'package:fintech_wallet/features/dashboard/presentation/screen/home_dashboard_screen.dart';
+import 'package:fintech_wallet/features/wallet/presentation/screen/wallet_screen.dart';
 import 'package:fintech_wallet/shared/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -23,8 +23,8 @@ class _MainNavigationState extends State<MainNavigation> {
     // Index scheme matches CustomBottomNavigation:
     // 0: Home, 1: Wallet, 2: (center action button, skipped), 3: Transfer, 4: Profile.
     page = [
-      const HomeDashboard(), // 0: Home
-      const WalletPage(),
+      const HomeDashboardScreen(), // 0: Home
+      const WalletScreen(),
       // const SizedBox.shrink(), // 2: unused (center "+" button)
       const _PlaceholderPage(title: 'Transfer'), // 3: Transfer
       const _PlaceholderPage(title: 'Profile'), // 4: Profile
