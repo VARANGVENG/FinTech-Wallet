@@ -11,9 +11,20 @@ class AppColors {
   static const error = Color(0xFFFF5630);
 
   // static const background = Color(0xFFF4F5F7);
-    static const background =Color.fromARGB(255, 7, 22, 49);
+  static const background = Color.fromARGB(255, 7, 22, 49);
   static const surface = Colors.white;
 
   static const textPrimary = Color(0xFF172B4D);
   static const textSecondary = Color(0xFF6B778C);
+
+  //  AppColors._(); // private constructor: this class is never instantiated,
+  // it's just a namespace for static constants.
+
+  // static const background = Color(0xFF0B0E1A);
+  static const cardBackground = Color(0xFF12162A);
+  static const cardBorder = Color(0xFF232842);
+  static const accentBlue = Color(0xFF4B5EF5);
+  // static const textPrimary = Colors.white;
+  // static const textSecondary = Color(0xFF8B90A8);
+  static const chipUnselectedBorder = Color(0xFF2C3150);
 }

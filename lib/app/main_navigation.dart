@@ -1,4 +1,4 @@
-import 'package:fintech_wallet/features/dashboard/presentation/page/home_dashboard.dart';
+import 'package:fintech_wallet/features/dashboard/presentation/page/home_dashboard_page.dart';
 import 'package:fintech_wallet/features/wallet/presentation/page/wallet_page.dart';
 import 'package:fintech_wallet/shared/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
