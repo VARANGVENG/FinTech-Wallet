@@ -1,3 +1,6 @@
+import 'package:fintech_wallet/features/authentication/data/datasource/auth_remote_datasource.dart';
+import 'package:fintech_wallet/features/authentication/data/repositories/auth_repository_impl.dart';
+import 'package:fintech_wallet/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum AuthStatus { initial, loading, success, error }
@@ -13,32 +16,23 @@ class AuthState {
   }
 }
 
+/// Now depends on [AuthRepository] — the domain-layer abstraction, not
+/// `AuthRepositoryImpl` or `AuthRemoteDataSource` directly. Same principle
+/// `TopUpNotifier` follows: this class only knows "something that can log
+/// a user in," not how that actually happens underneath.
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(const AuthState());
+  final AuthRepository _repository;
+
+  AuthNotifier(this._repository) : super(const AuthState());
 
   Future<void> login({required String email, required String password}) async {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
 
     try {
-      // TODO:
-      // await authRepository.login(email, password);
-
-      // Simulate API delay
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (email == "admin@gmail.com" && password == "123456") {
-        state = state.copyWith(status: AuthStatus.success);
-      } else {
-        state = state.copyWith(
-          status: AuthStatus.error,
-          errorMessage: "Invalid email or password",
-        );
-      }
+      await _repository.login(email: email, password: password);
+      state = state.copyWith(status: AuthStatus.success);
     } catch (e) {
-      state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      );
+      state = state.copyWith(status: AuthStatus.error, errorMessage: e.toString());
     }
   }
 
@@ -47,6 +41,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 }
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
-  (ref) => AuthNotifier(),
-);
+/// [AuthRemoteDataSource] is still the hardcoded mock it always was — no
+/// backend exists yet to call for real (see the earlier audit). What's
+/// different now is that this is the ONLY place that mock check lives,
+/// instead of being duplicated in `AuthNotifier` as well.
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepositoryImpl(AuthRemoteDataSource());
+});
+
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return AuthNotifier(repository);
+});
