@@ -1,17 +1,17 @@
 import 'package:fintech_wallet/app/constants.dart';
-import 'package:fintech_wallet/features/authentication/presentation/pages/login_page.dart';
+import 'package:fintech_wallet/features/authentication/presentation/screen/login_screen.dart';
 import 'package:fintech_wallet/shared/widgets/custom_button.dart';
 import 'package:fintech_wallet/shared/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<RegisterScreen> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   bool agreeTerms = false;
 
@@ -27,7 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       return;
     }
-    if (_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -113,6 +113,12 @@ class _RegisterPageState extends State<RegisterPage> {
                       prefixIcon: Icons.person,
                       controller: nameController,
                       hinText: 'Name',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Full name is required';
+                        }
+                        return null;
+                      },
                     ),
                     SizedBox(height: 18),
                     Text(
@@ -128,6 +134,12 @@ class _RegisterPageState extends State<RegisterPage> {
                       prefixIcon: Icons.email,
                       controller: emailController,
                       hinText: 'Email',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Email is required';
+                        }
+                        return null;
+                      },
                     ),
                     SizedBox(height: 18),
                     Text(
@@ -143,6 +155,12 @@ class _RegisterPageState extends State<RegisterPage> {
                       prefixIcon: Icons.lock,
                       controller: passwordController,
                       hinText: 'Password',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Password is required';
+                        }
+                        return null;
+                      },
                     ),
                     SizedBox(height: 18),
                     Text(
@@ -158,6 +176,12 @@ class _RegisterPageState extends State<RegisterPage> {
                       prefixIcon: Icons.lock,
                       controller: confirmPasswordController,
                       hinText: 'Confirm Password',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your password';
+                        }
+                        return null;
+                      },
                     ),
                     // SizedBox(height: 20),
                     Padding(
@@ -209,7 +233,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => LoginPage(),
+                                  builder: (context) => LoginScreen(),
                                 ),
                               );
                             },
