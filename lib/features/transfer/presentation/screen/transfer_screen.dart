@@ -1,4 +1,5 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/features/transfer/presentation/screen/confirm_transfer_screen.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/amount_entry_card.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_card.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/source_wallet_tile.dart';
@@ -43,28 +44,17 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
     super.dispose();
   }
 
-  Future<void> _handleContinue(BuildContext context) async {
-    final notifier = ref.read(transferProvider.notifier);
-    // Note isn't synced reactively like amount is — nothing in this screen
-    // needs to react to it changing, so it's only read here, right before
-    // submitting, same as `RegisterScreen` reads its controllers at
-    // submit-time rather than keeping them mirrored in state continuously.
-    notifier.setNote(_noteController.text.trim());
+void _handleContinue(BuildContext context) {
+  final notifier = ref.read(transferProvider.notifier);
+  // Same reasoning as before: note is only read here, right before moving
+  // on, not synced reactively.
+  notifier.setNote(_noteController.text.trim());
 
-    final result = await notifier.submit();
-    if (!context.mounted || result == null) return;
-
-    final amount = ref.read(transferProvider).amount;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          result.success
-              ? 'Reviewing transfer of \$${amount.toStringAsFixed(2)}'
-              : result.message ?? 'Something went wrong.',
-        ),
-      ),
-    );
-  }
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => const ConfirmTransferScreen()),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
