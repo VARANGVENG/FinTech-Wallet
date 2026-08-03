@@ -22,7 +22,6 @@ class CustomBottomNavigation extends StatelessWidget {
   static const Color _barColor = Color(0xFF14141C);
   static const Color _activeColor = Color(0xFF4C7CFF);
   static const Color _inactiveColor = Color(0xFF8A8D9F);
-  static const Color _actionColor = Color(0xFF3F73FF);
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +47,7 @@ class CustomBottomNavigation extends StatelessWidget {
                     borderRadius: BorderRadius.circular(38),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.35),
+                        color: Colors.black.withValues(alpha: 0.35),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),

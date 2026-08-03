@@ -39,7 +39,7 @@ class BalanceOverviewScaffold extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  if (headerLeading != null) headerLeading!,
+                  ?headerLeading,
                   const SizedBox(width: 10),
                   Text(
                     headerTitle,
@@ -91,7 +91,7 @@ class BalanceOverviewScaffold extends StatelessWidget {
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1B2338).withOpacity(0.26),
+                    color: const Color(0xFF1B2338).withValues(alpha: 0.26),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
@@ -99,7 +99,7 @@ class BalanceOverviewScaffold extends StatelessWidget {
                   ),
                   child: ListView.separated(
                     itemCount: transactionHistory.length,
-                    separatorBuilder: (_, __) => const Divider(
+                    separatorBuilder: (_, _) => const Divider(
                       height: 4,
                       indent: 10,
                       endIndent: 30,

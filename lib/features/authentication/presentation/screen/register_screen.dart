@@ -31,22 +31,15 @@ class _RegisterPageState extends State<RegisterScreen> {
       return;
     }
 
-    final name = nameController.text.trim();
-    final email = emailController.text.trim();
     final password = passwordController.text.trim();
     final confirmPassword = confirmPasswordController.text.trim();
 
-    // Check if passwords match
     if (password != confirmPassword) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
       return;
     }
-
-    // print('Name: $name');
-    // print('Email: $email');
-    // print('Password: $password');
 
     // TODO: Call Register API here
   }

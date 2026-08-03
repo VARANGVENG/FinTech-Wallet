@@ -52,7 +52,7 @@ class CustomTransactionHistoryItem extends StatelessWidget {
             // Leading icon
             CircleAvatar(
               radius: 24,
-              backgroundColor: AppColors.primary.withOpacity(0.1),
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
               child: Icon(transaction.icon, color: AppColors.primary),
             ),
             const SizedBox(width: 14),
@@ -74,7 +74,7 @@ class CustomTransactionHistoryItem extends StatelessWidget {
                 Text(
                   _formatDate(transaction.transactionDate),
                   style: TextStyle(
-                    color: AppColors.surface.withOpacity(0.7),
+                    color: AppColors.surface.withValues(alpha: 0.7),
                     fontSize: 13,
                   ),
                 ),

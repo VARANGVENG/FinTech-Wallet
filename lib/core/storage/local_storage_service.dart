@@ -24,7 +24,6 @@ class LocalStorageService {
   }
 
   static const _hasSeenOnboardingKey = 'has_seen_onboarding';
-  static const _cachedSettingsKey = 'cached_settings';
 
   bool get hasSeenOnboarding => _prefs.getBool(_hasSeenOnboardingKey) ?? false;
 

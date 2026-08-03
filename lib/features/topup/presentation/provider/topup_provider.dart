@@ -1,7 +1,7 @@
 import 'package:fintech_wallet/core/network/api_endpoints.dart';
 import 'package:fintech_wallet/features/topup/data/datasource/topup_remote_datasurce.dart';
-import 'package:fintech_wallet/features/topup/data/repositories/topup_respositories_Imp.dart';
 import 'package:fintech_wallet/features/topup/data/model/payment_method.dart';
+import 'package:fintech_wallet/features/topup/data/repositories/topup_repository_impl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/repositories/topup_repository.dart';
 

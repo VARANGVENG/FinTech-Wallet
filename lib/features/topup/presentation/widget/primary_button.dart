@@ -1,12 +1,6 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:flutter/material.dart';
-// import '../theme/app_colors.dart';
 
-/// Full-width primary call-to-action button.
-///
-/// Accepts an `isLoading` flag so the *same* widget can show a spinner while
-/// the API call is in flight, instead of the screen needing a second,
-/// separate "loading button" widget.
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -30,15 +24,20 @@ class PrimaryButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.accentBlue,
-          disabledBackgroundColor: AppColors.accentBlue.withOpacity(0.6),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          disabledBackgroundColor: AppColors.accentBlue.withValues(alpha: 0.6),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
           elevation: 0,
         ),
         child: isLoading
             ? const SizedBox(
                 width: 22,
                 height: 22,
-                child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.4,
+                  color: Colors.white,
+                ),
               )
             : Text(
                 label,
