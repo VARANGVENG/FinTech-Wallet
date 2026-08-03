@@ -5,12 +5,14 @@ class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final bool isLoading;
+  final IconData? icon;
 
   const PrimaryButton({
     super.key,
     required this.label,
     required this.onPressed,
     this.isLoading = false,
+    this.icon,
   });
 
   @override
@@ -19,8 +21,6 @@ class PrimaryButton extends StatelessWidget {
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        // Disabling onPressed while loading prevents duplicate submissions
-        // (e.g. impatient double-tapping firing two API calls).
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.accentBlue,
@@ -39,13 +39,22 @@ class PrimaryButton extends StatelessWidget {
                   color: Colors.white,
                 ),
               )
-            : Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                ),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, size: 18, color: Colors.white),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
       ),
     );

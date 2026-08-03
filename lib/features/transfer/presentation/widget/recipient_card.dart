@@ -11,14 +11,21 @@ import 'package:flutter/material.dart';
 class RecipientCard extends StatelessWidget {
   final Recipient recipient;
   final VoidCallback? onTap;
+  final bool showChevron;
 
-  const RecipientCard({super.key, required this.recipient, this.onTap});
+  const RecipientCard({
+    super.key,
+    required this.recipient,
+    this.onTap,
+    this.showChevron = true,
+  });
 
   String get _initials {
     final parts = recipient.name.trim().split(RegExp(r'\s+'));
     if (parts.isEmpty) return '';
     if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
-    return (parts.first.substring(0, 1) + parts.last.substring(0, 1)).toUpperCase();
+    return (parts.first.substring(0, 1) + parts.last.substring(0, 1))
+        .toUpperCase();
   }
 
   @override
@@ -40,7 +47,10 @@ class RecipientCard extends StatelessWidget {
               backgroundColor: AppColors.accentBlue,
               child: Text(
                 _initials,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             const SizedBox(width: 14),
@@ -59,12 +69,15 @@ class RecipientCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     recipient.email,
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+            if (showChevron) const Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],
         ),
       ),
