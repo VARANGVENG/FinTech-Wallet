@@ -1,4 +1,5 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/features/topup/presentation/screen/confirm_topup_screen.dart';
 import 'package:fintech_wallet/features/topup/presentation/widget/amount_input_card.dart';
 import 'package:fintech_wallet/features/topup/presentation/widget/payment_method_tile.dart';
 import 'package:fintech_wallet/shared/widgets/primary_button.dart';
@@ -31,20 +32,10 @@ class _TopUpScreenState extends ConsumerState<TopUpScreen> {
     });
   }
 
-  Future<void> _handleReviewTopUp(BuildContext context) async {
-    final notifier = ref.read(topUpProvider.notifier);
-    final result = await notifier.submit();
-    if (!context.mounted || result == null) return;
-
-    final amount = ref.read(topUpProvider).amount;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          result.success
-              ? 'Reviewing top-up of \$${amount.toStringAsFixed(2)}'
-              : result.message ?? 'Something went wrong.',
-        ),
-      ),
+  void _handleReviewTopUp(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ConfirmTopUpScreen()),
     );
   }
 
