@@ -1,7 +1,8 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/topup/presentation/widget/amount_input_card.dart';
 import 'package:fintech_wallet/features/topup/presentation/widget/payment_method_tile.dart';
-import 'package:fintech_wallet/features/topup/presentation/widget/primary_button.dart';
+import 'package:fintech_wallet/shared/widgets/primary_button.dart';
+import 'package:fintech_wallet/shared/widgets/secure_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../provider/topup_provider.dart';
@@ -140,22 +141,7 @@ class _TopUpScreenState extends ConsumerState<TopUpScreen> {
                     : () => _handleReviewTopUp(context),
               ),
               const SizedBox(height: 12),
-              const Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.lock, size: 14, color: AppColors.textSecondary),
-                    SizedBox(width: 6),
-                    Text(
-                      'Secured & encrypted',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const SecureBadge(),
             ],
           ),
         ),
