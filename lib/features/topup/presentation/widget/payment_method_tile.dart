@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 /// This lives outside the widget class as a private top-level function
 /// because it's a pure lookup with no dependency on widget state — no
 /// reason to make it a method that gets rebuilt with the widget.
-IconData _iconFor(PaymentMethodType type) {
+IconData iconForPaymentMethod(PaymentMethodType type) {
   switch (type) {
     case PaymentMethodType.linkedBank:
       return Icons.account_balance_rounded;
@@ -65,7 +65,7 @@ class PaymentMethodTile extends StatelessWidget {
                 color: AppColors.background,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(_iconFor(method.type), color: Colors.white70, size: 20),
+              child: Icon(iconForPaymentMethod(method.type), color: Colors.white70, size: 20),
             ),
             const SizedBox(width: 14),
             Expanded(
