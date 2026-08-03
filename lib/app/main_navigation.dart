@@ -1,4 +1,5 @@
 import 'package:fintech_wallet/features/dashboard/presentation/screen/home_dashboard_screen.dart';
+import 'package:fintech_wallet/features/transfer/presentation/screen/transfer_screen.dart';
 import 'package:fintech_wallet/features/wallet/presentation/screen/wallet_screen.dart';
 import 'package:fintech_wallet/shared/widgets/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +26,8 @@ class _MainNavigationState extends State<MainNavigation> {
     page = [
       const HomeDashboardScreen(), // 0: Home
       const WalletScreen(),
-      // const SizedBox.shrink(), // 2: unused (center "+" button)
-      const _PlaceholderPage(title: 'Transfer'), // 3: Transfer
+      const SizedBox.shrink(), // 2: unused (center "+" button)
+      const TransferScreen(), // 3: Transfer
       const _PlaceholderPage(title: 'Profile'), // 4: Profile
     ];
   }
@@ -60,9 +61,12 @@ class _MainNavigationState extends State<MainNavigation> {
       body: TweenAnimationBuilder<double>(
         key: ValueKey(currentIndex),
         tween: Tween(begin: 0.0, end: 1.0),
-        duration: Duration(microseconds: 200),
-        builder: (context, value, child) =>
-            Opacity(opacity: value, child: child),
+        duration: Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        builder: (context, value, child) => Opacity(
+          opacity: value,
+          child: Transform.scale(scale: 0.97 + (0.03 * value), child: child),
+        ),
         child: NotificationListener<UserScrollNotification>(
           onNotification: _handleScrollNotification,
           child: IndexedStack(index: currentIndex, children: page),
