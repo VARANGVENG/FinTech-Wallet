@@ -1,4 +1,5 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/features/topup/presentation/screen/topup_screen.dart';
 import 'package:fintech_wallet/shared/widgets/balance_overview_scaffold.dart';
 import 'package:fintech_wallet/shared/widgets/custom_card.dart';
 import 'package:fintech_wallet/shared/widgets/custome_quick_actions_item.dart';
@@ -25,11 +26,31 @@ class _WalletPageState extends State<WalletScreen> {
         availableBalance: 9850.20,
         pendingBalance: 2600.55,
       ),
-      quickActions: const [
-        CustomMenuItem(icon: Icons.add, iconColor: AppColors.primary, itemText: 'Top up'),
-        CustomMenuItem(icon: Icons.arrow_downward, iconColor: AppColors.primary, itemText: 'Withdraw'),
-        CustomMenuItem(icon: Icons.credit_card, iconColor: AppColors.primary, itemText: 'Card'),
-        CustomMenuItem(icon: Icons.history, iconColor: AppColors.primary, itemText: 'History'),
+      quickActions: [
+        CustomMenuItem(
+          icon: Icons.add,
+          iconColor: AppColors.primary,
+          itemText: 'Top up',
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const TopUpScreen()),
+          ),
+        ),
+        CustomMenuItem(
+          icon: Icons.arrow_downward,
+          iconColor: AppColors.primary,
+          itemText: 'Withdraw',
+        ),
+        CustomMenuItem(
+          icon: Icons.credit_card,
+          iconColor: AppColors.primary,
+          itemText: 'Card',
+        ),
+        CustomMenuItem(
+          icon: Icons.history,
+          iconColor: AppColors.primary,
+          itemText: 'History',
+        ),
       ],
       sectionTitle: 'Transaction History',
     );

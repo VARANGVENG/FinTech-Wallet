@@ -1,4 +1,6 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/features/topup/presentation/screen/topup_screen.dart';
+import 'package:fintech_wallet/features/transfer/presentation/screen/transfer_screen.dart';
 import 'package:fintech_wallet/shared/widgets/balance_overview_scaffold.dart';
 import 'package:fintech_wallet/shared/widgets/custom_card.dart';
 import 'package:fintech_wallet/shared/widgets/custome_quick_actions_item.dart';
@@ -23,11 +25,35 @@ class _HomeDashboardState extends State<HomeDashboardScreen> {
         availableBalance: 9850.20,
         pendingBalance: 2600.55,
       ),
-      quickActions: const [
-        CustomMenuItem(icon: Icons.add, iconColor: AppColors.primary, itemText: 'Top up'),
-        CustomMenuItem(icon: Icons.call_made, iconColor: AppColors.primary, itemText: 'Transfer'),
-        CustomMenuItem(icon: Icons.qr_code_scanner, iconColor: AppColors.primary, itemText: 'Scan'),
-        CustomMenuItem(icon: Icons.more_horiz, iconColor: AppColors.primary, itemText: 'More'),
+      quickActions: [
+        CustomMenuItem(
+          icon: Icons.add,
+          iconColor: AppColors.primary,
+          itemText: 'Top up',
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const TopUpScreen()),
+          ),
+        ),
+        CustomMenuItem(
+          icon: Icons.call_made,
+          iconColor: AppColors.primary,
+          itemText: 'Transfer',
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const TransferScreen()),
+          ),
+        ),
+        const CustomMenuItem(
+          icon: Icons.qr_code_scanner,
+          iconColor: AppColors.primary,
+          itemText: 'Scan',
+        ),
+        const CustomMenuItem(
+          icon: Icons.more_horiz,
+          iconColor: AppColors.primary,
+          itemText: 'More',
+        ),
       ],
       sectionTitle: 'Recent Activity',
     );
