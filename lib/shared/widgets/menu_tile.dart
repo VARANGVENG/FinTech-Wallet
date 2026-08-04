@@ -5,18 +5,20 @@ import 'package:flutter/material.dart';
 /// chevron, tappable. [textColor] defaults to the standard text color;
 /// Logout overrides it to red and turns off the chevron, since it's an
 /// action, not a navigation link like the others.
-class ProfileMenuTile extends StatelessWidget {
+class MenuTile extends StatelessWidget {
   final String title;
   final VoidCallback? onTap;
   final Color? textColor;
   final bool showChevron;
+  final String? trailing;
 
-  const ProfileMenuTile({
+  const MenuTile({
     super.key,
     required this.title,
     this.onTap,
     this.textColor,
     this.showChevron = true,
+    this.trailing,
   });
 
   @override
@@ -37,6 +39,16 @@ class ProfileMenuTile extends StatelessWidget {
                 ),
               ),
             ),
+            if (trailing != null) ...[
+              Text(
+                trailing!,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
             if (showChevron)
               const Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],

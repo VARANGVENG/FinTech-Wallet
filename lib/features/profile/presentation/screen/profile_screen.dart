@@ -1,8 +1,8 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/authentication/presentation/providers/auth_provider.dart';
 import 'package:fintech_wallet/features/authentication/presentation/screen/login_screen.dart';
-import 'package:fintech_wallet/features/profile/presentation/widget/profile_menu_tile.dart';
 import 'package:fintech_wallet/shared/utils/string_extensions.dart';
+import 'package:fintech_wallet/shared/widgets/menu_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,6 +30,7 @@ class ProfileScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
+        centerTitle: true,
         title: const Text(
           'Profile',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
@@ -64,7 +65,10 @@ class ProfileScreen extends ConsumerWidget {
               const SizedBox(height: 4),
               Text(
                 user?.email ?? '',
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
+                ),
               ),
               const SizedBox(height: 8),
               // "Verified" is mocked — User has no isVerified field yet
@@ -73,7 +77,11 @@ class ProfileScreen extends ConsumerWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.check_circle, color: AppColors.success, size: 14),
+                  const Icon(
+                    Icons.check_circle,
+                    color: AppColors.success,
+                    size: 14,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     'Verified',
@@ -92,19 +100,7 @@ class ProfileScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.cardBorder),
                 ),
-                child: const Column(
-                  children: [
-                    ProfileMenuTile(title: 'Personal Information'),
-                    Divider(height: 1, color: AppColors.cardBorder),
-                    ProfileMenuTile(title: 'Security'),
-                    Divider(height: 1, color: AppColors.cardBorder),
-                    ProfileMenuTile(title: 'Linked Accounts'),
-                    Divider(height: 1, color: AppColors.cardBorder),
-                    ProfileMenuTile(title: 'Documents'),
-                    Divider(height: 1, color: AppColors.cardBorder),
-                    ProfileMenuTile(title: 'Support Center'),
-                  ],
-                ),
+                child: const MenuTile(title: 'Personal Information'),
               ),
               const SizedBox(height: 16),
               Container(
@@ -113,7 +109,43 @@ class ProfileScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.cardBorder),
                 ),
-                child: ProfileMenuTile(
+                child: const MenuTile(title: 'Security'),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.cardBackground,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.cardBorder),
+                ),
+                child: const MenuTile(title: 'Linked Accounts'),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.cardBackground,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.cardBorder),
+                ),
+                child: const MenuTile(title: 'Documents'),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.cardBackground,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.cardBorder),
+                ),
+                child: const MenuTile(title: 'Support Center'),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.cardBackground,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.cardBorder),
+                ),
+                child: MenuTile(
                   title: 'Logout',
                   textColor: AppColors.error,
                   showChevron: false,
