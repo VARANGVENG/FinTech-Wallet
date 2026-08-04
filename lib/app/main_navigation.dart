@@ -1,4 +1,5 @@
 import 'package:fintech_wallet/features/dashboard/presentation/screen/home_dashboard_screen.dart';
+import 'package:fintech_wallet/features/profile/presentation/screen/profile_screen.dart';
 import 'package:fintech_wallet/features/transfer/presentation/screen/transfer_screen.dart';
 import 'package:fintech_wallet/features/wallet/presentation/screen/wallet_screen.dart';
 import 'package:fintech_wallet/shared/widgets/custom_bottom_navigation_bar.dart';
@@ -28,7 +29,7 @@ class _MainNavigationState extends State<MainNavigation> {
       const WalletScreen(),
       const SizedBox.shrink(), // 2: unused (center "+" button)
       const TransferScreen(), // 3: Transfer
-      const _PlaceholderPage(title: 'Profile'), // 4: Profile
+      const ProfileScreen(), // 4: Profile
     ];
   }
 
@@ -82,27 +83,6 @@ class _MainNavigationState extends State<MainNavigation> {
           onActionTap: () {
             // TODO: wire up the center "+" button.
           },
-        ),
-      ),
-    );
-  }
-}
-
-/// Temporary placeholder so the app doesn't crash while real pages
-/// for Wallet / Transfer / Profile are still being built.
-class _PlaceholderPage extends StatelessWidget {
-  const _PlaceholderPage({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // backgroundColor: const Color(0xFF0B0B10),
-      body: Center(
-        child: Text(
-          title,
-          style: const TextStyle(color: Colors.white, fontSize: 22),
         ),
       ),
     );
