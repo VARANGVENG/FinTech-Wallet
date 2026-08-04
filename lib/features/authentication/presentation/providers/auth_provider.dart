@@ -1,5 +1,6 @@
 import 'package:fintech_wallet/features/authentication/data/datasource/auth_remote_datasource.dart';
 import 'package:fintech_wallet/features/authentication/data/repositories/auth_repository_impl.dart';
+import 'package:fintech_wallet/features/authentication/domain/entities/user.dart';
 import 'package:fintech_wallet/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,11 +9,20 @@ enum AuthStatus { initial, loading, success, error }
 class AuthState {
   final AuthStatus status;
   final String? errorMessage;
+  final User? user;
 
-  const AuthState({this.status = AuthStatus.initial, this.errorMessage});
+  const AuthState({
+    this.status = AuthStatus.initial,
+    this.errorMessage,
+    this.user,
+  });
 
-  AuthState copyWith({AuthStatus? status, String? errorMessage}) {
-    return AuthState(status: status ?? this.status, errorMessage: errorMessage);
+  AuthState copyWith({AuthStatus? status, String? errorMessage, User? user}) {
+    return AuthState(
+      status: status ?? this.status,
+      errorMessage: errorMessage,
+      user: user ?? this.user,
+    );
   }
 }
 
@@ -29,10 +39,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
 
     try {
-      await _repository.login(email: email, password: password);
-      state = state.copyWith(status: AuthStatus.success);
+      final user = await _repository.login(email: email, password: password);
+      state = state.copyWith(status: AuthStatus.success, user: user);
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.error, errorMessage: e.toString());
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
     }
   }
 
