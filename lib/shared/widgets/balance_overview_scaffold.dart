@@ -12,6 +12,7 @@ class BalanceOverviewScaffold extends StatelessWidget {
   final Widget? headerLeading;
   final String headerTitle;
   final double? headerTitleFontSize;
+  final VoidCallback? onHeaderTap;
   final Widget balanceCard;
   final List<Widget> quickActions;
   final String sectionTitle;
@@ -21,6 +22,7 @@ class BalanceOverviewScaffold extends StatelessWidget {
     this.headerLeading,
     required this.headerTitle,
     this.headerTitleFontSize,
+    this.onHeaderTap,
     required this.balanceCard,
     required this.quickActions,
     required this.sectionTitle,
@@ -39,14 +41,23 @@ class BalanceOverviewScaffold extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  ?headerLeading,
-                  const SizedBox(width: 10),
-                  Text(
-                    headerTitle,
-                    style: TextStyle(
-                      color: AppColors.surface,
-                      fontWeight: FontWeight.w900,
-                      fontSize: headerTitleFontSize,
+                  InkWell(
+                    onTap: onHeaderTap,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ?headerLeading,
+                        const SizedBox(width: 10),
+                        Text(
+                          headerTitle,
+                          style: TextStyle(
+                            color: AppColors.surface,
+                            fontWeight: FontWeight.w900,
+                            fontSize: headerTitleFontSize,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const Spacer(),
@@ -83,7 +94,9 @@ class BalanceOverviewScaffold extends StatelessWidget {
                   const Spacer(),
                   Text(
                     'See all',
-                    style: TextStyle(color: const Color.fromARGB(255, 7, 143, 255)),
+                    style: TextStyle(
+                      color: const Color.fromARGB(255, 7, 143, 255),
+                    ),
                   ),
                 ],
               ),
@@ -105,9 +118,10 @@ class BalanceOverviewScaffold extends StatelessWidget {
                       endIndent: 30,
                       thickness: 0,
                     ),
-                    itemBuilder: (context, index) => CustomTransactionHistoryItem(
-                      transaction: transactionHistory[index],
-                    ),
+                    itemBuilder: (context, index) =>
+                        CustomTransactionHistoryItem(
+                          transaction: transactionHistory[index],
+                        ),
                   ),
                 ),
               ),

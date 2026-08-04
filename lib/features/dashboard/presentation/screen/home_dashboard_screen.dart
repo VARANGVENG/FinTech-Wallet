@@ -1,4 +1,5 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/features/settings/presentation/screen/settings_screen.dart';
 import 'package:fintech_wallet/features/topup/presentation/screen/topup_screen.dart';
 import 'package:fintech_wallet/features/transfer/presentation/screen/transfer_screen.dart';
 import 'package:fintech_wallet/shared/widgets/balance_overview_scaffold.dart';
@@ -19,6 +20,10 @@ class _HomeDashboardState extends State<HomeDashboardScreen> {
     return BalanceOverviewScaffold(
       headerLeading: const CircleAvatar(radius: 25),
       headerTitle: 'Hello, Alex',
+      onHeaderTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => SettingsScreen()),
+      ),
       balanceCard: const CustomCard(
         balanceType: 'Total Balance',
         totalBalance: 12450.75,
