@@ -1,5 +1,6 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/transfer/data/model/recipient.dart';
+import 'package:fintech_wallet/shared/utils/string_extensions.dart';
 import 'package:flutter/material.dart';
 
 /// Displays the transfer recipient: initials avatar, name, email, trailing
@@ -20,14 +21,6 @@ class RecipientCard extends StatelessWidget {
     this.showChevron = true,
   });
 
-  String get _initials {
-    final parts = recipient.name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty) return '';
-    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
-    return (parts.first.substring(0, 1) + parts.last.substring(0, 1))
-        .toUpperCase();
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -46,7 +39,7 @@ class RecipientCard extends StatelessWidget {
               radius: 20,
               backgroundColor: AppColors.accentBlue,
               child: Text(
-                _initials,
+                recipient.name.initials,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
@@ -77,7 +70,8 @@ class RecipientCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (showChevron) const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+            if (showChevron)
+              const Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],
         ),
       ),
