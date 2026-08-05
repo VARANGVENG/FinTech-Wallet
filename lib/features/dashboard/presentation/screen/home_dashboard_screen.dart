@@ -14,9 +14,15 @@ class HomeDashboardScreen extends StatefulWidget {
   State<HomeDashboardScreen> createState() => _HomeDashboardState();
 }
 
-class _HomeDashboardState extends State<HomeDashboardScreen> {
+class _HomeDashboardState extends State<HomeDashboardScreen> with AutomaticKeepAliveClientMixin{
+   
+
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BalanceOverviewScaffold(
       headerLeading: const CircleAvatar(radius: 25),
       headerTitle: 'Hello, Alex',

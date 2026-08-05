@@ -15,29 +15,47 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int currentIndex = 0;
-  late final List<Widget> page;
   bool _isNavVisible = true;
+  late final PageController _pageController;
+
+  // Dense index scheme, no reserved/dead slot: 0: Home, 1: Wallet,
+  // 2: Transfer, 3: Profile. The center "+" button is purely a floating
+  // visual element (see CustomBottomNavigation) — it never occupies a
+  // page index, so swiping never drags across a blank placeholder.
+  static const List<Widget> _pages = [
+    HomeDashboardScreen(),
+    WalletScreen(),
+    TransferScreen(),
+    ProfileScreen(),
+  ];
 
   @override
   void initState() {
     super.initState();
-
-    // Index scheme matches CustomBottomNavigation:
-    // 0: Home, 1: Wallet, 2: (center action button, skipped), 3: Transfer, 4: Profile.
-    page = [
-      const HomeDashboardScreen(), // 0: Home
-      const WalletScreen(),
-      const SizedBox.shrink(), // 2: unused (center "+" button)
-      const TransferScreen(), // 3: Transfer
-      const ProfileScreen(), // 4: Profile
-    ];
+    _pageController = PageController();
   }
 
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  /// Called by tapping a bottom-nav button — animates the swipe rather
+  /// than jumping instantly, so tapping and swiping feel like the same
+  /// underlying motion, not two different transition styles.
   void changePage(int index) {
-    if (index == 2) {
-      // Center "+" button — handle its action separately, don't navigate.
-      return;
-    }
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  /// Called by `PageView` itself whenever a swipe settles on a new page —
+  /// this is what keeps the bottom nav's highlighted tab in sync with
+  /// whatever you've swiped to, not just what you've tapped.
+  void _handlePageChanged(int index) {
     setState(() {
       currentIndex = index;
     });
@@ -59,18 +77,12 @@ class _MainNavigationState extends State<MainNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: TweenAnimationBuilder<double>(
-        key: ValueKey(currentIndex),
-        tween: Tween(begin: 0.0, end: 1.0),
-        duration: Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        builder: (context, value, child) => Opacity(
-          opacity: value,
-          child: Transform.scale(scale: 0.97 + (0.03 * value), child: child),
-        ),
-        child: NotificationListener<UserScrollNotification>(
-          onNotification: _handleScrollNotification,
-          child: IndexedStack(index: currentIndex, children: page),
+      body: NotificationListener<UserScrollNotification>(
+        onNotification: _handleScrollNotification,
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: _handlePageChanged,
+          children: _pages,
         ),
       ),
       bottomNavigationBar: AnimatedSlide(

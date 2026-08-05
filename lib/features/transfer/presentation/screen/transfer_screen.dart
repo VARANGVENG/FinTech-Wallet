@@ -25,9 +25,13 @@ class TransferScreen extends ConsumerStatefulWidget {
   ConsumerState<TransferScreen> createState() => _TransferScreenState();
 }
 
-class _TransferScreenState extends ConsumerState<TransferScreen> {
+class _TransferScreenState extends ConsumerState<TransferScreen>
+    with AutomaticKeepAliveClientMixin {
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -44,20 +48,21 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
     super.dispose();
   }
 
-void _handleContinue(BuildContext context) {
-  final notifier = ref.read(transferProvider.notifier);
-  // Same reasoning as before: note is only read here, right before moving
-  // on, not synced reactively.
-  notifier.setNote(_noteController.text.trim());
+  void _handleContinue(BuildContext context) {
+    final notifier = ref.read(transferProvider.notifier);
+    // Same reasoning as before: note is only read here, right before moving
+    // on, not synced reactively.
+    notifier.setNote(_noteController.text.trim());
 
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => const ConfirmTransferScreen()),
-  );
-}
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ConfirmTransferScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final state = ref.watch(transferProvider);
     final notifier = ref.read(transferProvider.notifier);
 

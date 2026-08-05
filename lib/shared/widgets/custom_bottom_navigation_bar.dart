@@ -8,12 +8,12 @@ class CustomBottomNavigation extends StatelessWidget {
     this.onActionTap,
   });
 
-  /// Index of the currently selected tab.
-  /// 0: Home, 1: Wallet, 3: Transfer, 4: Profile (2 is reserved for the
-  /// center action button and is never "selected").
+  /// Index of the currently selected tab — dense, 0 through 3. The center
+  /// "+" button below is a separate floating element with its own
+  /// [onActionTap] callback; it never occupies a page index.
   final int currentIndex;
 
-  /// Called with the tapped tab index (0, 1, 3, or 4).
+  /// Called with the tapped tab index (0, 1, 2, or 3).
   final ValueChanged<int> onTap;
 
   /// Called when the center circular "+" button is tapped.
@@ -81,20 +81,20 @@ class CustomBottomNavigation extends StatelessWidget {
                         child: _NavItem(
                           icon: Icons.compare_arrows_rounded,
                           label: 'Transfer',
-                          selected: currentIndex == 3,
+                          selected: currentIndex == 2,
                           activeColor: _activeColor,
                           inactiveColor: _inactiveColor,
-                          onTap: () => onTap(3),
+                          onTap: () => onTap(2),
                         ),
                       ),
                       Expanded(
                         child: _NavItem(
                           icon: Icons.person_rounded,
                           label: 'Profile',
-                          selected: currentIndex == 4,
+                          selected: currentIndex == 3,
                           activeColor: _activeColor,
                           inactiveColor: _inactiveColor,
-                          onTap: () => onTap(4),
+                          onTap: () => onTap(3),
                         ),
                       ),
                     ],

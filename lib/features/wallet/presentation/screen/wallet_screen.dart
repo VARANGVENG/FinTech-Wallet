@@ -12,9 +12,15 @@ class WalletScreen extends StatefulWidget {
   State<WalletScreen> createState() => _WalletPageState();
 }
 
-class _WalletPageState extends State<WalletScreen> {
+class _WalletPageState extends State<WalletScreen>
+    with AutomaticKeepAliveClientMixin {
+
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BalanceOverviewScaffold(
       headerTitle: 'My Walllet',
       headerTitleFontSize: 25,
