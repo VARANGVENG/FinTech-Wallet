@@ -10,22 +10,23 @@ import '../../data/model/app_notification.dart';
 class NotificationsNotifier extends StateNotifier<List<AppNotification>> {
   NotificationsNotifier() : super(_buildInitial());
 
-  static List<AppNotification> _buildInitial() {
-    final transactionNotifications = transactionHistory.map((t) {
-      return AppNotification(
-        id: 'txn_${t.id}',
-        category: NotificationCategory.transaction,
-        title: t.isIncome ? 'Money Received' : 'Transaction Completed',
-        message: t.isIncome
-            ? 'You received \$${t.amount.abs().toStringAsFixed(2)} from ${t.title}.'
-            : 'Your transaction of \$${t.amount.abs().toStringAsFixed(2)} at ${t.title} was completed.',
-        timestamp: t.transactionDate,
-        icon: t.icon,
-      );
-    }).toList();
+static List<AppNotification> _buildInitial() {
+  final transactionNotifications = transactionHistory.map((t) {
+    return AppNotification(
+      id: 'txn_${t.id}',
+      category: NotificationCategory.transaction,
+      title: t.isIncome ? 'Money Received' : 'Transaction Completed',
+      message: t.isIncome
+          ? 'You received \$${t.amount.abs().toStringAsFixed(2)} from ${t.title}.'
+          : 'Your transaction of \$${t.amount.abs().toStringAsFixed(2)} at ${t.title} was completed.',
+      timestamp: t.transactionDate,
+      icon: t.icon,
+      transaction: t,
+    );
+  }).toList();
 
-    return [...mockAlertNotifications, ...transactionNotifications];
-  }
+  return [...mockAlertNotifications, ...transactionNotifications];
+}
 
   /// Called once when `NotificationsScreen` opens — clears the unread
   /// badge, same "viewing the list marks it read" behavior most apps use.

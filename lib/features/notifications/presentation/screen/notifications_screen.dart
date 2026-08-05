@@ -2,6 +2,7 @@ import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/notifications/data/model/app_notification.dart';
 import 'package:fintech_wallet/features/notifications/presentation/provider/notifications_provider.dart';
 import 'package:fintech_wallet/features/notifications/presentation/widget/notification_tile.dart';
+import 'package:fintech_wallet/features/transactions/presentation/screen/transaction_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,10 +12,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// `markAllAsRead()` call, same "load/act once" convention every other
 /// screen's `initState` already follows.
 class NotificationsScreen extends ConsumerStatefulWidget {
-  const NotificationsScreen({super.key});
+  final int initialTabIndex;
+  const NotificationsScreen({super.key, this.initialTabIndex = 0});
 
   @override
-  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
@@ -24,7 +27,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notificationsProvider.notifier).markAllAsRead();
     });
@@ -39,10 +46,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   @override
   Widget build(BuildContext context) {
     final notifications = ref.watch(notificationsProvider);
-    final alerts =
-        notifications.where((n) => n.category == NotificationCategory.alert).toList();
-    final transactions =
-        notifications.where((n) => n.category == NotificationCategory.transaction).toList();
+    final alerts = notifications
+        .where((n) => n.category == NotificationCategory.alert)
+        .toList();
+    final transactions = notifications
+        .where((n) => n.category == NotificationCategory.transaction)
+        .toList();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -86,15 +95,35 @@ class _NotificationList extends StatelessWidget {
   Widget build(BuildContext context) {
     if (notifications.isEmpty) {
       return const Center(
-        child: Text('Nothing here yet.', style: TextStyle(color: AppColors.textSecondary)),
+        child: Text(
+          'Nothing here yet.',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
       );
     }
 
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: notifications.length,
-      separatorBuilder: (_, _) => const Divider(height: 1, color: AppColors.cardBorder),
-      itemBuilder: (context, index) => NotificationTile(notification: notifications[index]),
+      separatorBuilder: (_, _) =>
+          const Divider(height: 1, color: AppColors.cardBorder),
+      itemBuilder: (context, index) {
+        final notification = notifications[index];
+        final transaction = notification.transaction;
+
+        return NotificationTile(
+          notification: notification,
+          onTap: transaction == null
+              ? null
+              : () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        TransactionDetailScreen(transaction: transaction),
+                  ),
+                ),
+        );
+      },
     );
   }
 }

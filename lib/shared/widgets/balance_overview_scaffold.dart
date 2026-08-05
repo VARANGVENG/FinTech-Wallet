@@ -138,10 +138,18 @@ class BalanceOverviewScaffold extends ConsumerWidget {
                     ),
                   ),
                   const Spacer(),
-                  Text(
-                    'See all',
-                    style: TextStyle(
-                      color: const Color.fromARGB(255, 7, 143, 255),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => NotificationsScreen(initialTabIndex: 1),
+                      ),
+                    ),
+                    child: Text(
+                      'See all',
+                      style: TextStyle(
+                        color: const Color.fromARGB(255, 7, 143, 255),
+                      ),
                     ),
                   ),
                 ],
