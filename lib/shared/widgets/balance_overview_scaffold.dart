@@ -1,14 +1,17 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/core/mock/mock_transaction_history.dart';
+import 'package:fintech_wallet/features/notifications/presentation/provider/notifications_provider.dart';
+import 'package:fintech_wallet/features/notifications/presentation/screen/notifications_screen.dart';
 import 'package:fintech_wallet/shared/widgets/custom_transaction_history_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Shared page shell for Dashboard and Wallet — both screens are the same
 /// "avatar/title + notification bell, balance card, quick actions,
 /// section header, scrollable transaction list" layout with different data.
 /// Each caller supplies the four things that actually differ; everything
 /// else (background, spacing, the transaction list itself) lives here once.
-class BalanceOverviewScaffold extends StatelessWidget {
+class BalanceOverviewScaffold extends ConsumerWidget {
   final Widget? headerLeading;
   final String headerTitle;
   final double? headerTitleFontSize;
@@ -29,7 +32,8 @@ class BalanceOverviewScaffold extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(unreadNotificationCountProvider);
     return Scaffold(
       appBar: AppBar(backgroundColor: AppColors.background),
       body: Container(
@@ -61,15 +65,57 @@ class BalanceOverviewScaffold extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  Container(
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(19, 230, 221, 221),
-                      border: Border.all(color: Colors.white24),
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                  InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationsScreen(),
+                      ),
                     ),
-                    child: Icon(Icons.notifications, color: AppColors.surface),
+                    borderRadius: BorderRadius.circular(15),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 45,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(19, 230, 221, 221),
+                            border: Border.all(color: Colors.white24),
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          child: Icon(
+                            Icons.notifications,
+                            color: AppColors.surface,
+                          ),
+                        ),
+                        if (unreadCount > 0)
+                          Positioned(
+                            right: -2,
+                            top: -2,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              constraints: const BoxConstraints(
+                                minWidth: 18,
+                                minHeight: 18,
+                              ),
+                              decoration: const BoxDecoration(
+                                color: AppColors.error,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                unreadCount > 9 ? '9+' : '$unreadCount',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ],
               ),
