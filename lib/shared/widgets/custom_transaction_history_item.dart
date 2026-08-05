@@ -1,5 +1,6 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/dashboard/presentation/model/transaction_history_model.dart';
+import 'package:fintech_wallet/features/transactions/presentation/screen/transaction_detail_screen.dart';
 import 'package:flutter/material.dart';
 
 class CustomTransactionHistoryItem extends StatelessWidget {
@@ -41,9 +42,12 @@ class CustomTransactionHistoryItem extends StatelessWidget {
     final statusColor = isPending ? _pendingColor : _completedColor;
 
     return InkWell(
-      onTap: () {
-        // Navigate to transaction detail page
-      },
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => TransactionDetailScreen(transaction: transaction),
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 10),
         child: Row(
