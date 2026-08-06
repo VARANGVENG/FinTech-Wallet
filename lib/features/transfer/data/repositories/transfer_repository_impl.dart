@@ -21,6 +21,12 @@ class TransferRepositoryImpl implements TransferRepository {
   }
 
   @override
+  Future<List<Recipient>> getRecipients() async {
+    final rawList = await _remote.fetchRecipients();
+    return rawList.map((json) => Recipient.fromJson(json)).toList();
+  }
+
+  @override
   Future<TransferResult> submitTransfer({
     required Recipient recipient,
     required double amount,

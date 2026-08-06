@@ -75,6 +75,13 @@ class TransferNotifier extends StateNotifier<TransferState> {
     }
   }
 
+  /// Called when the user picks a different recipient from
+  /// `RecipientPickerScreen` — updates state directly, no network round
+  /// trip needed since the picker already fetched the full [Recipient].
+  void setRecipient(Recipient recipient) {
+    state = state.copyWith(recipient: recipient);
+  }
+
   void setAmount(double value) {
     state = state.copyWith(amount: value);
   }
@@ -100,7 +107,10 @@ class TransferNotifier extends StateNotifier<TransferState> {
       );
       return result;
     } catch (e) {
-      return const TransferResult(success: false, message: 'Something went wrong.');
+      return const TransferResult(
+        success: false,
+        message: 'Something went wrong.',
+      );
     } finally {
       state = state.copyWith(submitting: false);
     }
@@ -108,11 +118,15 @@ class TransferNotifier extends StateNotifier<TransferState> {
 }
 
 final transferRepositoryProvider = Provider<TransferRepository>((ref) {
-  final dataSource = HttpTransferRemoteDataSource(baseUrl: ApiEndpoints.baseUrl);
+  final dataSource = HttpTransferRemoteDataSource(
+    baseUrl: ApiEndpoints.baseUrl,
+  );
   return TransferRepositoryImpl(dataSource);
 });
 
-final transferProvider = StateNotifierProvider<TransferNotifier, TransferState>((ref) {
-  final repository = ref.watch(transferRepositoryProvider);
-  return TransferNotifier(repository);
-});
+final transferProvider = StateNotifierProvider<TransferNotifier, TransferState>(
+  (ref) {
+    final repository = ref.watch(transferRepositoryProvider);
+    return TransferNotifier(repository);
+  },
+);

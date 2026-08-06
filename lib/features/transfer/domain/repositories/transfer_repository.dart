@@ -9,7 +9,7 @@ class TransferResult {
   final String? message;
   final String? reference;
 
-  const TransferResult({required this.success, this.message, this.reference});
+  const TransferResult({required this.success, this.message, this.reference,});
 }
 
 /// The contract [TransferNotifier] depends on — never [TransferRepositoryImpl]
@@ -17,11 +17,13 @@ class TransferResult {
 /// provides: a test can swap in a `FakeTransferRepository` without touching
 /// the notifier at all.
 abstract class TransferRepository {
-  /// Returns the fixed mock recipient for now — see the conversation's
-  /// scope decision. A real version would instead be something like
-  /// `searchRecipients(String query)`, once recipient search/selection
-  /// is actually built.
   Future<Recipient> getDefaultRecipient();
+
+  /// Returns the list of contacts a user can pick as a transfer recipient.
+  /// Matches the backend plan's `GET /api/users/search` in spirit — no
+  /// actual query filtering yet, just a fixed list, same scope level as
+  /// Top-up's 3 fixed payment methods.
+  Future<List<Recipient>> getRecipients();
 
   Future<TransferResult> submitTransfer({
     required Recipient recipient,

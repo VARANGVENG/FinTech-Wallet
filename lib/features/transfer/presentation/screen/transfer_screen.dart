@@ -1,5 +1,7 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/features/transfer/data/model/recipient.dart';
 import 'package:fintech_wallet/features/transfer/presentation/screen/confirm_transfer_screen.dart';
+import 'package:fintech_wallet/features/transfer/presentation/screen/recipient_picker_screen.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/amount_entry_card.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_card.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/source_wallet_tile.dart';
@@ -126,7 +128,20 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
                   ),
                 )
               else if (state.recipient != null)
-                RecipientCard(recipient: state.recipient!, onTap: () {}),
+                RecipientCard(
+                  recipient: state.recipient!,
+                  onTap: () async {
+                    final selected = await Navigator.push<Recipient>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const RecipientPickerScreen(),
+                      ),
+                    );
+                    if (selected != null) {
+                      notifier.setRecipient(selected);
+                    }
+                  },
+                ),
               const SizedBox(height: 24),
               AmountEntryCard(
                 controller: _amountController,

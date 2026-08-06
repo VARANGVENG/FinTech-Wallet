@@ -1,15 +1,15 @@
+import 'package:fintech_wallet/features/transfer/data/model/recipient.dart';
+
 /// The remote data source is deliberately "dumb": it only knows how to talk
 /// to the network and hand back raw JSON-shaped data. It does NOT know about
 /// [Recipient] or any other domain model, and it does NOT decide what counts
 /// as "success" — that judgment belongs one layer up, in
 /// [TransferRepositoryImpl]. Same separation [TopUpRemoteDataSource] follows.
 abstract class TransferRemoteDataSource {
-  /// Returns raw recipient JSON for the fixed mock recipient.
   Future<Map<String, dynamic>> fetchDefaultRecipient();
 
-  /// Returns the raw JSON response body from the transfer-submission
-  /// endpoint. Throws on failure — it does not swallow or wrap errors,
-  /// that's the repository's job.
+  Future<List<Map<String, dynamic>>> fetchRecipients();
+
   Future<Map<String, dynamic>> postTransfer({
     required String recipientId,
     required double amount,
@@ -53,6 +53,41 @@ class HttpTransferRemoteDataSource implements TransferRemoteDataSource {
         'name': 'Michael Johnson',
         'email': 'michael.j@email.com',
       };
+    } catch (e) {
+      throw TransferNetworkException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchRecipients() async {
+    try {
+      // Real version:
+      // final res = await client.get(Uri.parse('$baseUrl/users/search?query=...'));
+      // ...
+
+      await Future.delayed(const Duration(milliseconds: 350));
+      return const [
+        {
+          'id': 'usr_michael_johnson',
+          'name': 'Michael Johnson',
+          'email': 'michael.j@email.com',
+        },
+        {
+          'id': 'usr_sarah_chen',
+          'name': 'Sarah Chen',
+          'email': 'sarah.chen@email.com',
+        },
+        {
+          'id': 'usr_david_martinez',
+          'name': 'David Martinez',
+          'email': 'd.martinez@email.com',
+        },
+        {
+          'id': 'usr_emily_wright',
+          'name': 'Emily Wright',
+          'email': 'emily.wright@email.com',
+        },
+      ];
     } catch (e) {
       throw TransferNetworkException(e.toString());
     }
