@@ -167,10 +167,10 @@ class BalanceOverviewScaffold extends ConsumerWidget {
                   child: ListView.separated(
                     itemCount: transactionHistory.length,
                     separatorBuilder: (_, _) => const Divider(
-                      height: 4,
-                      indent: 10,
+                      height: 2,
+                      indent: 30,
                       endIndent: 30,
-                      thickness: 0,
+                      color: AppColors.cardBorder,
                     ),
                     itemBuilder: (context, index) =>
                         CustomTransactionHistoryItem(

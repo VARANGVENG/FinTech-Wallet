@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 /// action, not a navigation link like the others.
 class MenuTile extends StatelessWidget {
   final String title;
+  final IconData? icon;
   final VoidCallback? onTap;
   final Color? textColor;
   final bool showChevron;
@@ -15,6 +16,7 @@ class MenuTile extends StatelessWidget {
   const MenuTile({
     super.key,
     required this.title,
+    this.icon,
     this.onTap,
     this.textColor,
     this.showChevron = true,
@@ -29,6 +31,24 @@ class MenuTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
           children: [
+            if (icon != null) ...[
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: (textColor ?? AppColors.textPrimary).withValues(
+                    alpha: 0.1,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  color: textColor ?? AppColors.textSecondary,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 14),
+            ],
             Expanded(
               child: Text(
                 title,
