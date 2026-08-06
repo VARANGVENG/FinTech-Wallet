@@ -21,7 +21,7 @@ class TopUpScreen extends ConsumerStatefulWidget {
 }
 
 class _TopUpScreenState extends ConsumerState<TopUpScreen> {
-  final _amountController = TextEditingController(text: '100.00');
+  final _amountController = TextEditingController(text: '0');
 
   @override
   void dispose() {
