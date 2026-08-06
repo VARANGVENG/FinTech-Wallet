@@ -59,25 +59,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Column(
                 children: [
                   SettingsSwitchTile(
+                    icon: Icons.notifications_outlined,
                     label: 'Push Notifications',
+                    subtitle: 'Receive app notifications',
                     value: settings.pushNotifications,
                     onChanged: notifier.setPushNotifications,
                   ),
                   const Divider(height: 1, color: AppColors.cardBorder),
                   SettingsSwitchTile(
+                    icon: Icons.receipt_long_outlined,
                     label: 'Transaction Alerts',
+                    subtitle: 'Notify on every transaction',
                     value: settings.transactionAlerts,
                     onChanged: notifier.setTransactionAlerts,
                   ),
                   const Divider(height: 1, color: AppColors.cardBorder),
                   SettingsSwitchTile(
+                    icon: Icons.fingerprint,
                     label: 'Biometric Login',
+                    subtitle: 'Use Face ID or Touch ID',
                     value: settings.biometricLogin,
                     onChanged: notifier.setBiometricLogin,
                   ),
                   const Divider(height: 1, color: AppColors.cardBorder),
                   SettingsSwitchTile(
+                    icon: Icons.dark_mode_outlined,
                     label: 'Dark Mode',
+                    subtitle: 'Always on in this version',
                     value: settings.darkMode,
                     onChanged: notifier.setDarkMode,
                   ),
@@ -93,14 +101,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.cardBorder),
               ),
-              child: const Column(
-                children: [
-                  MenuTile(title: 'Change PIN'),
-                  Divider(height: 1, color: AppColors.cardBorder),
-                  MenuTile(title: 'Change Password'),
-                  Divider(height: 1, color: AppColors.cardBorder),
-                  MenuTile(title: 'Two-Factor Authentication'),
-                ],
+              child: const MenuTile(
+                title: 'Change PIN',
+                icon: Icons.dialpad_outlined,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.cardBackground,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.cardBorder),
+              ),
+              child: const MenuTile(
+                title: 'Change Password',
+                icon: Icons.lock_outline,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.cardBackground,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.cardBorder),
+              ),
+              child: const MenuTile(
+                title: 'Two-Factor Authentication',
+                icon: Icons.shield_outlined,
+                trailing: 'Off',
               ),
             ),
             const SizedBox(height: 24),
@@ -114,7 +142,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               child: const MenuTile(
                 title: 'App Version',
-                trailing: '1.2.0',
+                icon: Icons.info_outline,
+                trailing: '1.0.0',
                 showChevron: false,
               ),
             ),
@@ -125,7 +154,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.cardBorder),
               ),
-              child: const MenuTile(title: 'About NovaPay'),
+              child: const MenuTile(
+                title: 'About NovaPay',
+                icon: Icons.bolt_outlined,
+              ),
             ),
           ],
         ),

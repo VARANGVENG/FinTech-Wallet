@@ -100,7 +100,10 @@ class ProfileScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.cardBorder),
                 ),
-                child: const MenuTile(title: 'Personal Information'),
+                child: const MenuTile(
+                  title: 'Personal Information',
+                  icon: Icons.person_outline,
+                ),
               ),
               const SizedBox(height: 16),
               Container(
@@ -109,7 +112,10 @@ class ProfileScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.cardBorder),
                 ),
-                child: const MenuTile(title: 'Security'),
+                child: const MenuTile(
+                  title: 'Security',
+                  icon: Icons.shield_outlined,
+                ),
               ),
               const SizedBox(height: 16),
               Container(
@@ -118,7 +124,10 @@ class ProfileScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.cardBorder),
                 ),
-                child: const MenuTile(title: 'Linked Accounts'),
+                child: const MenuTile(
+                  title: 'Linked Accounts',
+                  icon: Icons.account_balance_outlined,
+                ),
               ),
               const SizedBox(height: 16),
               Container(
@@ -127,7 +136,10 @@ class ProfileScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.cardBorder),
                 ),
-                child: const MenuTile(title: 'Documents'),
+                child: const MenuTile(
+                  title: 'Documents',
+                  icon: Icons.folder_outlined,
+                ),
               ),
               const SizedBox(height: 16),
               Container(
@@ -136,7 +148,10 @@ class ProfileScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.cardBorder),
                 ),
-                child: const MenuTile(title: 'Support Center'),
+                child: const MenuTile(
+                  title: 'Support Center',
+                  icon: Icons.headset_mic_outlined,
+                ),
               ),
               const SizedBox(height: 16),
               Container(
@@ -147,6 +162,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 child: MenuTile(
                   title: 'Logout',
+                  icon: Icons.logout,
                   textColor: AppColors.error,
                   showChevron: false,
                   onTap: () => _handleLogout(context, ref),
