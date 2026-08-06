@@ -1,12 +1,13 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/features/dashboard/presentation/model/transaction_history_model.dart';
 import 'package:fintech_wallet/features/notifications/data/model/app_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 /// A single row in the Notifications list — icon, title, message,
-/// timestamp, and an unread dot. Same "leading icon circle + title/
-/// subtitle column" shape as `CustomTransactionHistoryItem`, since
-/// notifications are visually the same kind of list row.
+/// timestamp, unread dot, and (for transaction-category notifications) a
+/// highlighted amount on the right, matching `CustomTransactionHistoryItem`'s
+/// own sign/color treatment exactly — same colors, same +/- convention.
 class NotificationTile extends StatelessWidget {
   final AppNotification notification;
   final VoidCallback? onTap;
@@ -15,6 +16,8 @@ class NotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final transaction = notification.transaction;
+
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -79,6 +82,21 @@ class NotificationTile extends StatelessWidget {
                 ],
               ),
             ),
+            if (transaction != null) ...[
+              const SizedBox(width: 12),
+              Text(
+                '${transaction.isIncome ? '+' : '-'}\$${transaction.amount.abs().toStringAsFixed(2)}',
+                style: TextStyle(
+                  color: transaction.status == TransactionStatus.pending
+                      ? AppColors.warning
+                      : (transaction.isIncome
+                            ? AppColors.success
+                            : AppColors.error),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ],
           ],
         ),
       ),
