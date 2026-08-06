@@ -14,6 +14,8 @@ class AmountInputCard extends StatelessWidget {
   final double amount;
   final String currency;
   final List<double> quickAmounts;
+  final TextEditingController controller;
+  final ValueChanged<String> onAmountChanged;
   final ValueChanged<double> onQuickAmountSelected;
   final ValueChanged<String> onCurrencyTap;
 
@@ -22,6 +24,8 @@ class AmountInputCard extends StatelessWidget {
     required this.amount,
     required this.currency,
     required this.quickAmounts,
+    required this.controller,
+    required this.onAmountChanged,
     required this.onQuickAmountSelected,
     required this.onCurrencyTap,
   });
@@ -59,21 +63,40 @@ class AmountInputCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const Icon(Icons.keyboard_arrow_down, color: AppColors.textPrimary, size: 18),
+                    const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColors.textPrimary,
+                      size: 18,
+                    ),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            '\$${amount.toStringAsFixed(2)}',
+          const SizedBox(height: 8),
+          TextField(
+            controller: controller,
+            onChanged: onAmountChanged,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 44,
               fontWeight: FontWeight.w800,
             ),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+              prefixText: '\$',
+              prefixStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 44,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
           ),
+          const SizedBox(height: 20),
           const SizedBox(height: 20),
           Row(
             children: quickAmounts

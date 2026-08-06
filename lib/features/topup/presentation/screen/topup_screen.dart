@@ -21,6 +21,14 @@ class TopUpScreen extends ConsumerStatefulWidget {
 }
 
 class _TopUpScreenState extends ConsumerState<TopUpScreen> {
+  final _amountController = TextEditingController(text: '100.00');
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -70,7 +78,13 @@ class _TopUpScreenState extends ConsumerState<TopUpScreen> {
                 amount: state.amount,
                 currency: state.currency,
                 quickAmounts: TopUpNotifier.quickAmounts,
-                onQuickAmountSelected: notifier.selectQuickAmount,
+                controller: _amountController,
+                onAmountChanged: (value) =>
+                    notifier.setAmount(double.tryParse(value) ?? 0),
+                onQuickAmountSelected: (value) {
+                  notifier.setAmount(value);
+                  _amountController.text = value.toStringAsFixed(2);
+                },
                 onCurrencyTap: (_) {},
               ),
               const SizedBox(height: 28),

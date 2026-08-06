@@ -77,7 +77,7 @@ class TopUpNotifier extends StateNotifier<TopUpState> {
     }
   }
 
-  void selectQuickAmount(double value) {
+  void setAmount(double value) {
     state = state.copyWith(amount: value);
   }
 
@@ -98,7 +98,10 @@ class TopUpNotifier extends StateNotifier<TopUpState> {
       );
       return result;
     } catch (e) {
-      return const TopUpResult(success: false, message: 'Something went wrong.');
+      return const TopUpResult(
+        success: false,
+        message: 'Something went wrong.',
+      );
     } finally {
       state = state.copyWith(submitting: false);
     }

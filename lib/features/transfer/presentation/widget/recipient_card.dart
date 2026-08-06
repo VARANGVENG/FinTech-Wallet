@@ -37,7 +37,7 @@ class RecipientCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 20,
-              backgroundColor: AppColors.accentBlue,
+              backgroundColor: recipient.name.avatarColor,
               child: Text(
                 recipient.name.initials,
                 style: const TextStyle(
@@ -61,7 +61,7 @@ class RecipientCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    recipient.email,
+                    recipient.subtitle,
                     style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 13,
@@ -70,6 +70,23 @@ class RecipientCard extends StatelessWidget {
                 ],
               ),
             ),
+            if (recipient.isFrequent)
+              Container(
+                margin: EdgeInsets.only(right: showChevron ? 8 : 0),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.accentBlue.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'Frequent',
+                  style: TextStyle(
+                    color: AppColors.accentBlue,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             if (showChevron)
               const Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],
