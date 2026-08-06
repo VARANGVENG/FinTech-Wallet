@@ -24,4 +24,13 @@ final List<AppNotification> mockAlertNotifications = [
     timestamp: DateTime.now().subtract(const Duration(days: 1)),
     icon: Icons.security,
   ),
+  AppNotification(
+  id: 'alert_003',
+  category: NotificationCategory.alert,
+  title: 'Suspicious Transaction Detected',
+  message: 'We noticed unusual activity on your card ending in 4242. Tap to review.',
+  timestamp: DateTime.now().subtract(const Duration(minutes: 30)),
+  icon: Icons.gpp_maybe_outlined,
+  isFraudAlert: true,
+),
 ];

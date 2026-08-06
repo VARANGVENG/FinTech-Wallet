@@ -1,4 +1,5 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/features/fraud/presentation/screen/fraud_alert_screen.dart';
 import 'package:fintech_wallet/features/notifications/data/model/app_notification.dart';
 import 'package:fintech_wallet/features/notifications/presentation/provider/notifications_provider.dart';
 import 'package:fintech_wallet/features/notifications/presentation/widget/notification_tile.dart';
@@ -111,18 +112,22 @@ class _NotificationList extends StatelessWidget {
         final notification = notifications[index];
         final transaction = notification.transaction;
 
-        return NotificationTile(
-          notification: notification,
-          onTap: transaction == null
-              ? null
-              : () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        TransactionDetailScreen(transaction: transaction),
-                  ),
-                ),
-        );
+        VoidCallback? onTap;
+        if (notification.isFraudAlert) {
+          onTap = () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const FraudAlertScreen()),
+          );
+        } else if (transaction != null) {
+          onTap = () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TransactionDetailScreen(transaction: transaction),
+            ),
+          );
+        }
+
+        return NotificationTile(notification: notification, onTap: onTap);
       },
     );
   }

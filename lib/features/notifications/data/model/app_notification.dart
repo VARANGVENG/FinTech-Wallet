@@ -16,6 +16,7 @@ class AppNotification {
   final IconData icon;
   final bool isRead;
   final TransactionHistoryModel? transaction;
+  final bool isFraudAlert;
 
   const AppNotification({
     required this.id,
@@ -26,6 +27,7 @@ class AppNotification {
     required this.icon,
     this.isRead = false,
     this.transaction,
+    this.isFraudAlert = false,
   });
 
   AppNotification copyWith({bool? isRead}) {
@@ -38,6 +40,7 @@ class AppNotification {
       icon: icon,
       isRead: isRead ?? this.isRead,
       transaction: transaction,
+      isFraudAlert: isFraudAlert,
     );
   }
 }
