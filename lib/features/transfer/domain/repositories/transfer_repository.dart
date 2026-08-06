@@ -1,3 +1,5 @@
+import 'package:fintech_wallet/features/transfer/data/model/wallet.dart';
+
 import '../../data/model/recipient.dart';
 
 /// Domain-level result of submitting a transfer. Lives at the domain layer,
@@ -17,13 +19,14 @@ class TransferResult {
 /// provides: a test can swap in a `FakeTransferRepository` without touching
 /// the notifier at all.
 abstract class TransferRepository {
-  Future<Recipient> getDefaultRecipient();
 
   /// Returns the list of contacts a user can pick as a transfer recipient.
   /// Matches the backend plan's `GET /api/users/search` in spirit — no
   /// actual query filtering yet, just a fixed list, same scope level as
   /// Top-up's 3 fixed payment methods.
   Future<List<Recipient>> getRecipients();
+
+  Future<List<Wallet>> getWallets();
 
   Future<TransferResult> submitTransfer({
     required Recipient recipient,

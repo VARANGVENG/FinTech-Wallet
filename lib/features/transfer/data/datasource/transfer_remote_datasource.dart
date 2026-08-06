@@ -6,9 +6,9 @@ import 'package:fintech_wallet/features/transfer/data/model/recipient.dart';
 /// as "success" — that judgment belongs one layer up, in
 /// [TransferRepositoryImpl]. Same separation [TopUpRemoteDataSource] follows.
 abstract class TransferRemoteDataSource {
-  Future<Map<String, dynamic>> fetchDefaultRecipient();
-
   Future<List<Map<String, dynamic>>> fetchRecipients();
+
+  Future<List<Map<String, dynamic>>> fetchWallets();
 
   Future<Map<String, dynamic>> postTransfer({
     required String recipientId,
@@ -38,27 +38,6 @@ class HttpTransferRemoteDataSource implements TransferRemoteDataSource {
   HttpTransferRemoteDataSource({required this.baseUrl});
 
   @override
-  Future<Map<String, dynamic>> fetchDefaultRecipient() async {
-    try {
-      // Real version:
-      // final res = await client.get(Uri.parse('$baseUrl/users/search?query=...'));
-      // if (res.statusCode != 200) {
-      //   throw TransferNetworkException('Status ${res.statusCode}');
-      // }
-      // return jsonDecode(res.body);
-
-      await Future.delayed(const Duration(milliseconds: 300));
-      return const {
-        'id': 'usr_michael_johnson',
-        'name': 'Michael Johnson',
-        'email': 'michael.j@email.com',
-      };
-    } catch (e) {
-      throw TransferNetworkException(e.toString());
-    }
-  }
-
-  @override
   Future<List<Map<String, dynamic>>> fetchRecipients() async {
     try {
       // Real version:
@@ -70,23 +49,50 @@ class HttpTransferRemoteDataSource implements TransferRemoteDataSource {
         {
           'id': 'usr_michael_johnson',
           'name': 'Michael Johnson',
-          'email': 'michael.j@email.com',
+          'subtitle': 'michael.johnson@gmail.com',
+          'isFrequent': true,
         },
         {
-          'id': 'usr_sarah_chen',
-          'name': 'Sarah Chen',
-          'email': 'sarah.chen@email.com',
+          'id': 'usr_sarah_lee',
+          'name': 'Sarah Lee',
+          'subtitle': 'sarah.lee@icloud.com',
+          'isFrequent': true,
         },
         {
-          'id': 'usr_david_martinez',
-          'name': 'David Martinez',
-          'email': 'd.martinez@email.com',
+          'id': 'usr_david_kim',
+          'name': 'David Kim',
+          'subtitle': 'Wells Fargo · •••• 3390',
+          'isFrequent': false,
         },
         {
-          'id': 'usr_emily_wright',
-          'name': 'Emily Wright',
-          'email': 'emily.wright@email.com',
+          'id': 'usr_emma_wilson',
+          'name': 'Emma Wilson',
+          'subtitle': 'emma.w@novapay.app',
+          'isFrequent': true,
         },
+        {
+          'id': 'usr_james_carter',
+          'name': 'James Carter',
+          'subtitle': 'Citibank · •••• 1204',
+          'isFrequent': false,
+        },
+      ];
+    } catch (e) {
+      throw TransferNetworkException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchWallets() async {
+    try {
+      // Real version:
+      // final res = await client.get(Uri.parse('$baseUrl/wallets'));
+      // ...
+
+      await Future.delayed(const Duration(milliseconds: 300));
+      return const [
+        {'id': 'wallet_novapay', 'name': 'NovaPay Wallet', 'balance': 9450.75},
+        {'id': 'wallet_savings', 'name': 'Savings Wallet', 'balance': 8200.00},
       ];
     } catch (e) {
       throw TransferNetworkException(e.toString());

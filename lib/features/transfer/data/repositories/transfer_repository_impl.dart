@@ -1,3 +1,5 @@
+import 'package:fintech_wallet/features/transfer/data/model/wallet.dart';
+
 import '../datasource/transfer_remote_datasource.dart';
 import '../model/recipient.dart';
 import '../../domain/repositories/transfer_repository.dart';
@@ -12,18 +14,15 @@ class TransferRepositoryImpl implements TransferRepository {
   TransferRepositoryImpl(this._remote);
 
   @override
-  Future<Recipient> getDefaultRecipient() async {
-    // Any TransferNetworkException thrown here is intentionally left to
-    // propagate — the provider is responsible for catching it and turning
-    // it into an "error" UI state, not this layer.
-    final json = await _remote.fetchDefaultRecipient();
-    return Recipient.fromJson(json);
-  }
-
-  @override
   Future<List<Recipient>> getRecipients() async {
     final rawList = await _remote.fetchRecipients();
     return rawList.map((json) => Recipient.fromJson(json)).toList();
+  }
+
+  @override
+  Future<List<Wallet>> getWallets() async {
+    final rawList = await _remote.fetchWallets();
+    return rawList.map((json) => Wallet.fromJson(json)).toList();
   }
 
   @override

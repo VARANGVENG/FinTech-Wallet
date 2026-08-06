@@ -4,22 +4,22 @@
 class Recipient {
   final String id;
   final String name;
-  final String email;
+  final String subtitle;
+  final bool isFrequent;
 
   const Recipient({
     required this.id,
     required this.name,
-    required this.email,
+    required this.subtitle,
+    this.isFrequent = false,
   });
 
-  /// Factory for when recipient data comes back from a backend as JSON,
-  /// e.g. `GET /api/users/search`. One place that knows how to turn raw
-  /// JSON into a [Recipient], same convention as `PaymentMethod.fromJson`.
   factory Recipient.fromJson(Map<String, dynamic> json) {
     return Recipient(
       id: json['id'] as String,
       name: json['name'] as String,
-      email: json['email'] as String,
+      subtitle: json['subtitle'] as String,
+      isFrequent: json['isFrequent'] as bool? ?? false,
     );
   }
 }

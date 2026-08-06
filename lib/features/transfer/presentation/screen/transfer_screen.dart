@@ -1,9 +1,10 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/transfer/data/model/recipient.dart';
 import 'package:fintech_wallet/features/transfer/presentation/screen/confirm_transfer_screen.dart';
-import 'package:fintech_wallet/features/transfer/presentation/screen/recipient_picker_screen.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/amount_entry_card.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_card.dart';
+import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_picker_sheet.dart';
+import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_select_prompt.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/source_wallet_tile.dart';
 import 'package:fintech_wallet/shared/widgets/custom_text_field.dart';
 import 'package:fintech_wallet/shared/widgets/primary_button.dart';
@@ -39,7 +40,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(transferProvider.notifier).loadRecipient();
+      ref.read(transferProvider.notifier).loadWallets();
     });
   }
 
@@ -62,6 +63,21 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     );
   }
 
+  Future<void> _openRecipientPicker(
+    BuildContext context,
+    TransferNotifier notifier,
+  ) async {
+    final selected = await showModalBottomSheet<Recipient>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const RecipientPickerSheet(),
+    );
+    if (selected != null) {
+      notifier.setRecipient(selected);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -74,7 +90,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
         backgroundColor: AppColors.background,
         elevation: 0,
         centerTitle: true,
-        leading: const BackButton(color: Colors.white),
+        // leading: const BackButton(color: Colors.white),
         title: const Text(
           'Transfer',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
@@ -95,58 +111,20 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
                 ),
               ),
               const SizedBox(height: 12),
-              if (state.loadingRecipient)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.accentBlue,
-                    ),
-                  ),
-                )
-              else if (state.errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          state.errorMessage!,
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: notifier.loadRecipient,
-                          child: const Text(
-                            'Retry',
-                            style: TextStyle(color: AppColors.accentBlue),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              else if (state.recipient != null)
+              if (state.recipient != null)
                 RecipientCard(
                   recipient: state.recipient!,
-                  onTap: () async {
-                    final selected = await Navigator.push<Recipient>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const RecipientPickerScreen(),
-                      ),
-                    );
-                    if (selected != null) {
-                      notifier.setRecipient(selected);
-                    }
-                  },
+                  onTap: () => _openRecipientPicker(context, notifier),
+                )
+              else
+                RecipientSelectPrompt(
+                  onTap: () => _openRecipientPicker(context, notifier),
                 ),
               const SizedBox(height: 24),
               AmountEntryCard(
                 controller: _amountController,
                 currency: state.currency,
-                availableBalance: 3850.20,
+                availableBalance: state.selectedWallet?.balance ?? 0,
                 onAmountChanged: (value) =>
                     notifier.setAmount(double.tryParse(value) ?? 0),
                 onCurrencyTap: (_) {},
@@ -166,6 +144,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
                 hinText: 'Dinner payment',
               ),
               const SizedBox(height: 24),
+              const SizedBox(height: 24),
               const Text(
                 'Select Source',
                 style: TextStyle(
@@ -175,10 +154,31 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
                 ),
               ),
               const SizedBox(height: 8),
-              const SourceWalletTile(
-                walletName: 'NovaPay Wallet',
-                balance: 3850.20,
-              ),
+              if (state.loadingWallets)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.accentBlue,
+                    ),
+                  ),
+                )
+              else
+                Column(
+                  children: [
+                    for (final wallet in state.wallets) ...[
+                      SourceWalletTile(
+                        walletName: wallet.name,
+                        balance: wallet.balance,
+                        selected: wallet.id == state.selectedWallet?.id,
+                        onTap: () => notifier.selectWallet(wallet),
+                      ),
+                      if (wallet != state.wallets.last)
+                        const SizedBox(height: 12),
+                    ],
+                  ],
+                ),
+              const SizedBox(height: 28),
               const SizedBox(height: 28),
               PrimaryButton(
                 label: 'Continue',

@@ -1,5 +1,6 @@
 import 'package:fintech_wallet/core/network/api_endpoints.dart';
 import 'package:fintech_wallet/features/transfer/data/datasource/transfer_remote_datasource.dart';
+import 'package:fintech_wallet/features/transfer/data/model/wallet.dart';
 import 'package:fintech_wallet/features/transfer/data/repositories/transfer_repository_impl.dart';
 import 'package:fintech_wallet/features/transfer/data/model/recipient.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,18 +14,20 @@ class TransferState {
   final double amount;
   final String currency;
   final String? note;
-  final bool loadingRecipient;
   final bool submitting;
-  final String? errorMessage;
+  final List<Wallet> wallets;
+  final Wallet? selectedWallet;
+  final bool loadingWallets;
 
   const TransferState({
     this.recipient,
     this.amount = 0.0,
     this.currency = 'USD',
     this.note,
-    this.loadingRecipient = true,
     this.submitting = false,
-    this.errorMessage,
+    this.wallets = const [],
+    this.selectedWallet,
+    this.loadingWallets = true,
   });
 
   TransferState copyWith({
@@ -32,21 +35,20 @@ class TransferState {
     double? amount,
     String? currency,
     String? note,
-    bool? loadingRecipient,
     bool? submitting,
-    String? errorMessage,
+    List<Wallet>? wallets,
+    Wallet? selectedWallet,
+    bool? loadingWallets,
   }) {
     return TransferState(
       recipient: recipient ?? this.recipient,
       amount: amount ?? this.amount,
       currency: currency ?? this.currency,
       note: note ?? this.note,
-      loadingRecipient: loadingRecipient ?? this.loadingRecipient,
       submitting: submitting ?? this.submitting,
-      // Same deliberate exception as TopUpState/AuthState: not preserved
-      // with `??` like the other fields, so any copyWith call that doesn't
-      // pass this explicitly resets it to null.
-      errorMessage: errorMessage,
+      wallets: wallets ?? this.wallets,
+      selectedWallet: selectedWallet ?? this.selectedWallet,
+      loadingWallets: loadingWallets ?? this.loadingWallets,
     );
   }
 }
@@ -59,29 +61,6 @@ class TransferNotifier extends StateNotifier<TransferState> {
 
   TransferNotifier(this._repository) : super(const TransferState());
 
-  /// Called once from the screen's `initState`, same role as
-  /// `loadPaymentMethods` in `TopUpNotifier`.
-  Future<void> loadRecipient() async {
-    state = state.copyWith(loadingRecipient: true, errorMessage: null);
-
-    try {
-      final recipient = await _repository.getDefaultRecipient();
-      state = state.copyWith(recipient: recipient, loadingRecipient: false);
-    } catch (e) {
-      state = state.copyWith(
-        loadingRecipient: false,
-        errorMessage: 'Could not load recipient.',
-      );
-    }
-  }
-
-  /// Called when the user picks a different recipient from
-  /// `RecipientPickerScreen` — updates state directly, no network round
-  /// trip needed since the picker already fetched the full [Recipient].
-  void setRecipient(Recipient recipient) {
-    state = state.copyWith(recipient: recipient);
-  }
-
   void setAmount(double value) {
     state = state.copyWith(amount: value);
   }
@@ -89,6 +68,33 @@ class TransferNotifier extends StateNotifier<TransferState> {
   void setNote(String value) {
     state = state.copyWith(note: value);
   }
+
+  /// Called when the user picks a recipient from the recipient-picker
+  /// bottom sheet — updates state directly, no network round trip needed
+  /// since the sheet already fetched the full [Recipient]. There's no
+  /// auto-loaded default anymore — this is the ONLY way `state.recipient`
+  /// ever gets set.
+  void setRecipient(Recipient recipient) {
+    state = state.copyWith(recipient: recipient);
+  }
+
+  Future<void> loadWallets() async {
+  state = state.copyWith(loadingWallets: true);
+  try {
+    final wallets = await _repository.getWallets();
+    state = state.copyWith(
+      wallets: wallets,
+      loadingWallets: false,
+      selectedWallet: wallets.isNotEmpty ? wallets.first : null,
+    );
+  } catch (e) {
+    state = state.copyWith(loadingWallets: false);
+  }
+}
+
+void selectWallet(Wallet wallet) {
+  state = state.copyWith(selectedWallet: wallet);
+}
 
   /// Returns the result so the screen decides what to do next (navigate,
   /// show an error) — the notifier never triggers navigation itself.
