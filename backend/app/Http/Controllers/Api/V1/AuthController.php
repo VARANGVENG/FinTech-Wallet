@@ -10,16 +10,27 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request): JsonResponse
     {
-        $user = User::create([
-            'full_name' => $request->validated('full_name'),
-            'email' => $request->validated('email'),
-            'password' => $request->validated('password'),
-        ])->refresh();
+        $user = DB::transaction(function () use ($request) {
+            $user = User::create([
+                'full_name' => $request->validated('full_name'),
+                'email' => $request->validated('email'),
+                'password' => $request->validated('password'),
+            ]);
+
+            $user->wallets()->create([
+                'name' => 'Nova Pay Wallet',
+                'balance' => 0,
+                'is_default' => true,
+            ]);
+
+            return $user->refresh();
+        });
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

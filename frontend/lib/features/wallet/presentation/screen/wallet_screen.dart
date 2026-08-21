@@ -4,15 +4,17 @@ import 'package:fintech_wallet/shared/widgets/balance_overview_scaffold.dart';
 import 'package:fintech_wallet/shared/widgets/custom_card.dart';
 import 'package:fintech_wallet/shared/widgets/custome_quick_actions_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/wallet_provider.dart';
 
-class WalletScreen extends StatefulWidget {
+class WalletScreen extends ConsumerStatefulWidget {
   const WalletScreen({super.key});
 
   @override
-  State<WalletScreen> createState() => _WalletPageState();
+  ConsumerState<WalletScreen> createState() => _WalletPageState();
 }
 
-class _WalletPageState extends State<WalletScreen>
+class _WalletPageState extends ConsumerState<WalletScreen>
     with AutomaticKeepAliveClientMixin {
 
   @override
@@ -21,16 +23,35 @@ class _WalletPageState extends State<WalletScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final walletAsync = ref.watch(walletProvider);
+
     return BalanceOverviewScaffold(
       headerTitle: 'My Walllet',
       headerTitleFontSize: 25,
-      balanceCard: const CustomCard(
-        balanceType: 'Nova Pay Wallet',
-        cardType: 'Visa',
-        cardNumber: '**** **** **** 1234',
-        totalBalance: 12450.75,
-        availableBalance: 9850.20,
-        pendingBalance: 2600.55,
+      balanceCard: walletAsync.when(
+        data: (wallet) => CustomCard(
+          balanceType: wallet.name,
+          cardType: 'Visa',
+          cardNumber: '**** **** **** 1234',
+          totalBalance: wallet.balance,
+          availableBalance: wallet.balance,
+          pendingBalance: 0.0,
+        ),
+        loading: () => const SizedBox(
+          height: 180,
+          child: Center(
+            child: CircularProgressIndicator(color: AppColors.surface),
+          ),
+        ),
+        error: (error, _) => const SizedBox(
+          height: 180,
+          child: Center(
+            child: Text(
+              'Unable to load wallet',
+              style: TextStyle(color: AppColors.surface),
+            ),
+          ),
+        ),
       ),
       quickActions: [
         CustomMenuItem(

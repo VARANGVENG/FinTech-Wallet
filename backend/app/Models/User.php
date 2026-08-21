@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['full_name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
@@ -30,5 +31,10 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_verified' => 'boolean',
         ];
+    }
+
+        public function wallets(): HasMany
+    {
+        return $this->hasMany(Wallet::class);
     }
 }
