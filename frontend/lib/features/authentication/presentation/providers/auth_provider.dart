@@ -1,3 +1,5 @@
+import 'package:fintech_wallet/core/errors/api_exception.dart';
+import 'package:fintech_wallet/core/providers/core_providers.dart';
 import 'package:fintech_wallet/features/authentication/data/datasource/auth_remote_datasource.dart';
 import 'package:fintech_wallet/features/authentication/data/repositories/auth_repository_impl.dart';
 import 'package:fintech_wallet/features/authentication/domain/entities/user.dart';
@@ -26,10 +28,6 @@ class AuthState {
   }
 }
 
-/// Now depends on [AuthRepository] — the domain-layer abstraction, not
-/// `AuthRepositoryImpl` or `AuthRemoteDataSource` directly. Same principle
-/// `TopUpNotifier` follows: this class only knows "something that can log
-/// a user in," not how that actually happens underneath.
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repository;
 
@@ -44,22 +42,45 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(
         status: AuthStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: e is ApiException ? e.message : e.toString(),
       );
     }
   }
 
-  void reset() {
+  Future<void> register({
+    required String fullName,
+    required String email,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+
+    try {
+      final user = await _repository.register(
+        fullName: fullName,
+        email: email,
+        password: password,
+        passwordConfirmation: passwordConfirmation,
+      );
+      state = state.copyWith(status: AuthStatus.success, user: user);
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e is ApiException ? e.message : e.toString(),
+      );
+    }
+  }
+
+  Future<void> logout() async {
+    await _repository.logout();
     state = const AuthState();
   }
 }
 
-/// [AuthRemoteDataSource] is still the hardcoded mock it always was — no
-/// backend exists yet to call for real (see the earlier audit). What's
-/// different now is that this is the ONLY place that mock check lives,
-/// instead of being duplicated in `AuthNotifier` as well.
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepositoryImpl(AuthRemoteDataSource());
+  final apiClient = ref.watch(apiClientProvider);
+  final secureStorage = ref.watch(secureStorageProvider);
+  return AuthRepositoryImpl(AuthRemoteDataSource(apiClient), secureStorage);
 });
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {

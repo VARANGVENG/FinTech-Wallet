@@ -1,4 +1,5 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/app/main_navigation.dart';
 import 'package:fintech_wallet/features/authentication/presentation/screen/register_screen.dart';
 import 'package:fintech_wallet/shared/widgets/custom_button.dart';
 import 'package:fintech_wallet/shared/widgets/custom_text_field.dart';
@@ -17,15 +18,16 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginPageState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   @override
+    @override
   void initState() {
     super.initState();
     ref.listenManual<AuthState>(authProvider, (previous, next) {
       if (next.status == AuthStatus.success) {
-        ScaffoldMessenger.of(
+        Navigator.pushAndRemoveUntil(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Login successful')));
-
-        // Navigator.pushReplacement(...);
+          MaterialPageRoute(builder: (_) => const MainNavigation()),
+          (route) => false,
+        );
       }
 
       if (next.status == AuthStatus.error) {
@@ -36,7 +38,7 @@ class _LoginPageState extends ConsumerState<LoginScreen> {
     });
   }
 
-  Future<void> login() async {
+    Future<void> login() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -48,19 +50,6 @@ class _LoginPageState extends ConsumerState<LoginScreen> {
           password: passwordController.text.trim(),
         );
   }
-  // void login() {
-  //   if (!_formKey.currentState!.validate()) {
-  //     return;
-  //   }
-
-  //   // final email = emailController.text.trim();
-  //   // final password = passwordController.text.trim();
-
-  //   // print('Email: $email');
-  //   // print('Password: $password');
-
-  //   // TODO: Call API here
-  // }
 
   void signinwithgamil() {}
 
@@ -244,7 +233,7 @@ class _LoginPageState extends ConsumerState<LoginScreen> {
                           SizedBox(width: 10),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => RegisterScreen(),

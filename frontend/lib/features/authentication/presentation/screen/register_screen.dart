@@ -1,17 +1,21 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/app/main_navigation.dart';
 import 'package:fintech_wallet/features/authentication/presentation/screen/login_screen.dart';
 import 'package:fintech_wallet/shared/widgets/custom_button.dart';
 import 'package:fintech_wallet/shared/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class RegisterScreen extends StatefulWidget {
+import '../providers/auth_provider.dart';
+
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterPageState();
+  ConsumerState<RegisterScreen> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterScreen> {
+class _RegisterPageState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   bool agreeTerms = false;
 
@@ -20,7 +24,27 @@ class _RegisterPageState extends State<RegisterScreen> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  void register() {
+  @override
+  void initState() {
+    super.initState();
+    ref.listenManual<AuthState>(authProvider, (previous, next) {
+      if (next.status == AuthStatus.success) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const MainNavigation()),
+          (route) => false,
+        );
+      }
+
+      if (next.status == AuthStatus.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.errorMessage ?? 'Registration failed')),
+        );
+      }
+    });
+  }
+
+  Future<void> register() async {
     if (!agreeTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please accept the Terms & Conditions')),
@@ -41,11 +65,19 @@ class _RegisterPageState extends State<RegisterScreen> {
       return;
     }
 
-    // TODO: Call Register API here
+    await ref
+        .read(authProvider.notifier)
+        .register(
+          fullName: nameController.text.trim(),
+          email: emailController.text.trim(),
+          password: password,
+          passwordConfirmation: confirmPassword,
+        );
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text('Resgister'),
@@ -204,8 +236,12 @@ class _RegisterPageState extends State<RegisterScreen> {
                       ),
                     ),
                     CustomButton(
-                      text: 'Create Account',
-                      onPressed: register,
+                      text: authState.status == AuthStatus.loading
+                          ? 'Creating account...'
+                          : 'Create Account',
+                      onPressed: authState.status == AuthStatus.loading
+                          ? null
+                          : register,
                       backgroundColor: const Color.fromARGB(255, 7, 143, 255),
                     ),
                     SizedBox(height: 30),
@@ -223,7 +259,7 @@ class _RegisterPageState extends State<RegisterScreen> {
                           SizedBox(width: 10),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => LoginScreen(),

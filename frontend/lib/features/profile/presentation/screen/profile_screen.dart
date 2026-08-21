@@ -12,8 +12,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
-  void _handleLogout(BuildContext context, WidgetRef ref) {
-    ref.read(authProvider.notifier).reset();
+  Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
+    await ref.read(authProvider.notifier).logout();
+    if (!context.mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -45,7 +46,7 @@ class ProfileScreen extends ConsumerWidget {
                 radius: 36,
                 backgroundColor: AppColors.accentBlue,
                 child: Text(
-                  (user?.name ?? '').initials,
+                  (user?.fullName ?? '').initials,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -55,7 +56,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                user?.name ?? '',
+                user?.fullName ?? '',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -70,29 +71,28 @@ class ProfileScreen extends ConsumerWidget {
                   fontSize: 13,
                 ),
               ),
-              const SizedBox(height: 8),
-              // "Verified" is mocked — User has no isVerified field yet
-              // (matches the backend plan's `is_verified` column, which
-              // isn't implemented in the domain entity yet).
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.check_circle,
-                    color: AppColors.success,
-                    size: 14,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Verified',
-                    style: TextStyle(
+              if (user?.isVerified ?? false) ...[
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
                       color: AppColors.success,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      size: 14,
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Verified',
+                      style: TextStyle(
+                        color: AppColors.success,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 28),
               Container(
                 decoration: BoxDecoration(

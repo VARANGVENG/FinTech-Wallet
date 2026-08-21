@@ -1,11 +1,13 @@
 class User {
   final int id;
-  final String name;
+  final String fullName;
   final String email;
+  final bool isVerified;
 
   const User({
     required this.id,
-    required this.name,
+    required this.fullName,
     required this.email,
+    required this.isVerified,
   });
 }

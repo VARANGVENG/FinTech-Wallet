@@ -1,18 +1,18 @@
-/// Every endpoint path the app calls, in one place. Datasources reference
-/// these constants instead of writing raw strings — so if the backend
-/// renames `/topups` to `/top-ups` tomorrow, you fix it here once, instead
-/// of hunting through every `XRemoteDataSource` file that happened to call it.
 class ApiEndpoints {
   ApiEndpoints._(); // static-only namespace, never instantiated
 
-  // Swap this per environment (dev/staging/prod) — see the note in
-  // ApiClient below about injecting this rather than hardcoding it here.
-  static const String baseUrl = 'https://api.yourbackend.com';
+  // Android emulator only: 10.0.2.2 is a special alias the emulator maps
+  // to the host machine's own 127.0.0.1 — so `php artisan serve` (which
+  // binds 127.0.0.1:8000 by default) is reachable as-is, no --host flag
+  // needed. This will need to change for a physical device (host's LAN IP)
+  // or iOS simulator (localhost works directly there).
+  static const String baseUrl = 'http://10.0.2.2:8000/api/v1';
 
   // Auth
-  static const String login = '/auth/login';
-  static const String refreshToken = '/auth/refresh';
-  static const String logout = '/auth/logout';
+  static const String register = '/register';
+  static const String login = '/login';
+  static const String me = '/me';
+  static const String logout = '/logout';
 
   // Top-up feature
   static const String paymentMethods = '/payment-methods';
@@ -31,6 +31,5 @@ class ApiEndpoints {
   static String fraudAlertRespond(String transactionId) => '/fraud-alerts/$transactionId/respond';
 
   // Profile & settings
-  static const String me = '/me';
   static const String settings = '/settings';
 }
