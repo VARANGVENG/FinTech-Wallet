@@ -25,8 +25,16 @@ class AuthController extends Controller
 
             $user->wallets()->create([
                 'name' => 'Nova Pay Wallet',
+                'currency' => 'USD',
                 'balance' => 0,
                 'is_default' => true,
+            ]);
+
+            $user->wallets()->create([
+                'name' => 'Nova Pay Wallet (KHR)',
+                'currency' => 'KHR',
+                'balance' => 0,
+                'is_default' => false,
             ]);
 
             return $user->refresh();

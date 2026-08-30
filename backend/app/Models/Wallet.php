@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'name', 'balance', 'is_default'])]
+#[Fillable(['user_id', 'name', 'currency', 'balance', 'is_default'])]
 class Wallet extends Model
 {
     use HasFactory;
@@ -27,4 +28,10 @@ class Wallet extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function transactions(): HasMany
+{
+    return $this->hasMany(Transaction::class);
+}
+
 }
