@@ -1,10 +1,10 @@
 import 'package:fintech_wallet/app/constants.dart';
-import 'package:fintech_wallet/features/dashboard/presentation/model/transaction_history_model.dart';
+import 'package:fintech_wallet/features/transactions/domain/entities/transaction.dart';
 import 'package:fintech_wallet/features/transactions/presentation/screen/transaction_detail_screen.dart';
 import 'package:flutter/material.dart';
 
 class CustomTransactionHistoryItem extends StatelessWidget {
-  final TransactionHistoryModel transaction;
+  final Transaction transaction;
 
   const CustomTransactionHistoryItem({super.key, required this.transaction});
 
@@ -12,6 +12,28 @@ class CustomTransactionHistoryItem extends StatelessWidget {
   static const Color _debitColor = Colors.white;
   static const Color _pendingColor = Color(0xFFE8A33D);
   static const Color _completedColor = Color(0xFF3DDC84);
+
+  static IconData _iconFor(TransactionType type) {
+    switch (type) {
+      case TransactionType.topup:
+        return Icons.add_circle_outline;
+      case TransactionType.transferIn:
+        return Icons.call_received;
+      case TransactionType.transferOut:
+        return Icons.call_made;
+    }
+  }
+
+  static String _titleFor(TransactionType type) {
+    switch (type) {
+      case TransactionType.topup:
+        return 'Top Up';
+      case TransactionType.transferIn:
+        return 'Transfer In';
+      case TransactionType.transferOut:
+        return 'Transfer Out';
+    }
+  }
 
   String _formatDate(DateTime date) {
     const months = [
@@ -35,7 +57,7 @@ class CustomTransactionHistoryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final amountColor = transaction.isIncome ? _creditColor : _debitColor;
     final sign = transaction.isIncome ? '+' : '-';
-    final amountText = '$sign\$${transaction.amount.abs().toStringAsFixed(2)}';
+    final amountText = '$sign\$${transaction.amount.toStringAsFixed(2)}';
 
     final isPending = transaction.status == TransactionStatus.pending;
     final statusText = isPending ? 'Pending' : 'Completed';
@@ -49,7 +71,7 @@ class CustomTransactionHistoryItem extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -57,7 +79,7 @@ class CustomTransactionHistoryItem extends StatelessWidget {
             CircleAvatar(
               radius: 24,
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-              child: Icon(transaction.icon, color: AppColors.primary),
+              child: Icon(_iconFor(transaction.type), color: AppColors.primary),
             ),
             const SizedBox(width: 14),
 
@@ -67,7 +89,7 @@ class CustomTransactionHistoryItem extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  transaction.title,
+                  transaction.description ?? _titleFor(transaction.type),
                   style: const TextStyle(
                     color: AppColors.surface,
                     fontWeight: FontWeight.w600,
@@ -76,7 +98,7 @@ class CustomTransactionHistoryItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  _formatDate(transaction.transactionDate),
+                  _formatDate(transaction.createdAt),
                   style: TextStyle(
                     color: AppColors.surface.withValues(alpha: 0.7),
                     fontSize: 13,

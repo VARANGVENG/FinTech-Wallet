@@ -13,5 +13,7 @@ abstract class AuthRepository {
     required String passwordConfirmation,
   });
 
+  Future<User> me();
+
   Future<void> logout();
 }

@@ -1,6 +1,7 @@
 import 'package:fintech_wallet/app/main_navigation.dart';
 import 'package:fintech_wallet/core/providers/core_providers.dart';
 import 'package:fintech_wallet/core/storage/local_storage_service.dart';
+import 'package:fintech_wallet/features/authentication/presentation/providers/auth_provider.dart';
 import 'package:fintech_wallet/features/authentication/presentation/screen/login_screen.dart';
 import 'package:fintech_wallet/features/authentication/presentation/screen/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamilyFallback: const ['NotoSansKhmer']),
       home: const _StartupGate(),
     );
   }
@@ -49,7 +51,19 @@ class _StartupGateState extends ConsumerState<_StartupGate> {
   @override
   void initState() {
     super.initState();
-    _isLoggedIn = ref.read(secureStorageProvider).isLoggedIn;
+    _isLoggedIn = _resolveInitialRoute();
+  }
+
+  Future<bool> _resolveInitialRoute() async {
+    final hasToken = await ref.read(secureStorageProvider).isLoggedIn;
+    if (!hasToken) return false;
+
+    await ref.read(authProvider.notifier).restoreSession();
+    // Re-check rather than trusting `hasToken`: `restoreSession()` clears
+    // the token only on a confirmed 401. If it's still here, either the
+    // session was confirmed valid, or we simply couldn't check (offline/5xx)
+    // — either way, that's not grounds to bounce the user to LoginScreen.
+    return ref.read(secureStorageProvider).isLoggedIn;
   }
 
   @override

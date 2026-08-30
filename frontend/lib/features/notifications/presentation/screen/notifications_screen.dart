@@ -3,7 +3,6 @@ import 'package:fintech_wallet/features/fraud/presentation/screen/fraud_alert_sc
 import 'package:fintech_wallet/features/notifications/data/model/app_notification.dart';
 import 'package:fintech_wallet/features/notifications/presentation/provider/notifications_provider.dart';
 import 'package:fintech_wallet/features/notifications/presentation/widget/notification_tile.dart';
-import 'package:fintech_wallet/features/transactions/presentation/screen/transaction_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -110,7 +109,6 @@ class _NotificationList extends StatelessWidget {
           const Divider(height: 1, color: AppColors.cardBorder),
       itemBuilder: (context, index) {
         final notification = notifications[index];
-        final transaction = notification.transaction;
 
         VoidCallback? onTap;
         if (notification.isFraudAlert) {
@@ -118,15 +116,7 @@ class _NotificationList extends StatelessWidget {
             context,
             MaterialPageRoute(builder: (_) => const FraudAlertScreen()),
           );
-        } else if (transaction != null) {
-          onTap = () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => TransactionDetailScreen(transaction: transaction),
-            ),
-          );
-        }
-
+        } 
         return NotificationTile(notification: notification, onTap: onTap);
       },
     );

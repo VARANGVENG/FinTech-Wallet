@@ -4,11 +4,7 @@ import 'package:fintech_wallet/shared/utils/string_extensions.dart';
 import 'package:flutter/material.dart';
 
 /// Displays the transfer recipient: initials avatar, name, email, trailing
-/// chevron. The chevron is purely visual for now — Transfer only supports
-/// the one fixed mock recipient today (see the conversation's scope
-/// decision), so [onTap] has nothing to do yet. Wiring real recipient
-/// search/selection later means giving [onTap] a real handler, not
-/// changing this widget's layout.
+/// chevron.
 class RecipientCard extends StatelessWidget {
   final Recipient recipient;
   final VoidCallback? onTap;
@@ -37,9 +33,9 @@ class RecipientCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 20,
-              backgroundColor: recipient.name.avatarColor,
+              backgroundColor: recipient.fullName.avatarColor,
               child: Text(
-                recipient.name.initials,
+                recipient.fullName.initials,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
@@ -52,7 +48,7 @@ class RecipientCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    recipient.name,
+                    recipient.fullName,
                     style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -61,7 +57,7 @@ class RecipientCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    recipient.subtitle,
+                    recipient.email,
                     style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 13,
@@ -70,23 +66,6 @@ class RecipientCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (recipient.isFrequent)
-              Container(
-                margin: EdgeInsets.only(right: showChevron ? 8 : 0),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.accentBlue.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'Frequent',
-                  style: TextStyle(
-                    color: AppColors.accentBlue,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
             if (showChevron)
               const Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ],

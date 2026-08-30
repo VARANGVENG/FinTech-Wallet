@@ -22,9 +22,12 @@ class TopUpScreen extends ConsumerStatefulWidget {
 
 class _TopUpScreenState extends ConsumerState<TopUpScreen> {
   final _amountController = TextEditingController(text: '0');
+  final _amountFocusNode = FocusNode();
 
   @override
   void dispose() {
+    _amountFocusNode.removeListener(_handleAmountFocusChange);
+    _amountFocusNode.dispose();
     _amountController.dispose();
     super.dispose();
   }
@@ -32,12 +35,65 @@ class _TopUpScreenState extends ConsumerState<TopUpScreen> {
   @override
   void initState() {
     super.initState();
+    _amountFocusNode.addListener(_handleAmountFocusChange);
     // `ref.read` here, not `ref.watch` — same reasoning as before: this
     // calls a method once, it doesn't need to subscribe this widget to
     // future state changes.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(topUpProvider.notifier).loadPaymentMethods();
     });
+  }
+
+  void _handleAmountFocusChange() {
+    if (_amountFocusNode.hasFocus) {
+      if (_amountController.text == '0') {
+        _amountController.clear();
+      }
+    } else if (_amountController.text.isEmpty) {
+      final amount = ref.read(topUpProvider).amount;
+      _amountController.text = amount == 0 ? '0' : amount.toStringAsFixed(2);
+    }
+  }
+
+  Future<void> _handleCurrencyTap(
+    BuildContext context,
+    String currentCurrency,
+  ) async {
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppColors.cardBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final code in const ['USD', 'KHR'])
+                ListTile(
+                  title: Text(
+                    code,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  trailing: code == currentCurrency
+                      ? const Icon(Icons.check, color: AppColors.accentBlue)
+                      : null,
+                  onTap: () => Navigator.pop(context, code),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected == null || !context.mounted) return;
+
+    ref.read(topUpProvider.notifier).setCurrency(selected);
+    _amountController.text = ref.read(topUpProvider).amount.toStringAsFixed(2);
   }
 
   void _handleReviewTopUp(BuildContext context) {
@@ -77,15 +133,18 @@ class _TopUpScreenState extends ConsumerState<TopUpScreen> {
               AmountInputCard(
                 amount: state.amount,
                 currency: state.currency,
-                quickAmounts: TopUpNotifier.quickAmounts,
+                currencySymbol: TopUpNotifier.symbolFor(state.currency),
+                quickAmounts: TopUpNotifier.quickAmountsFor(state.currency),
                 controller: _amountController,
+                focusNode: _amountFocusNode,
                 onAmountChanged: (value) =>
                     notifier.setAmount(double.tryParse(value) ?? 0),
                 onQuickAmountSelected: (value) {
                   notifier.setAmount(value);
                   _amountController.text = value.toStringAsFixed(2);
                 },
-                onCurrencyTap: (_) {},
+                onCurrencyTap: (current) =>
+                    _handleCurrencyTap(context, current),
               ),
               const SizedBox(height: 28),
               const Text(

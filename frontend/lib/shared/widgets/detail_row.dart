@@ -27,15 +27,12 @@ class DetailRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: AppColors.surface, fontSize: 14),
           ),
           Text(
             value,
             style: TextStyle(
-              color: valueColor ?? AppColors.textPrimary,
+              color: valueColor ?? AppColors.surface,
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),

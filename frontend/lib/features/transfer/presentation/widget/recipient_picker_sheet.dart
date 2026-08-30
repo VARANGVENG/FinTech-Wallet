@@ -1,16 +1,12 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/core/errors/api_exception.dart';
 import 'package:fintech_wallet/features/transfer/data/model/recipient.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../provider/transfer_provider.dart';
 
-/// Content of the recipient-picker bottom sheet — pushed via
-/// `showModalBottomSheet` from `TransferScreen`, not `Navigator.push`, so
-/// it overlays Transfer with the bottom nav still visible underneath,
-/// matching the mockup. Still has no Riverpod provider/notifier of its
-/// own — loading + local search filtering is transient, one-shot UI
-/// state, not ongoing feature state anything else needs to react to.
+
 class RecipientPickerSheet extends ConsumerStatefulWidget {
   const RecipientPickerSheet({super.key});
 
@@ -20,46 +16,46 @@ class RecipientPickerSheet extends ConsumerStatefulWidget {
 }
 
 class _RecipientPickerSheetState extends ConsumerState<RecipientPickerSheet> {
-  List<Recipient>? _recipients;
+  final _emailController = TextEditingController();
+  bool _searching = false;
   String? _errorMessage;
-  String _query = '';
+  Recipient? _found;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
   }
 
-  Future<void> _load() async {
+  Future<void> _search() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) return;
+
+    setState(() {
+      _searching = true;
+      _errorMessage = null;
+      _found = null;
+    });
+
     try {
       final repository = ref.read(transferRepositoryProvider);
-      final recipients = await repository.getRecipients();
+      final recipient = await repository.findRecipient(email);
       if (!mounted) return;
-      setState(() => _recipients = recipients);
-    } catch (e) {
+      setState(() => _found = recipient);
+    } on ApiException catch (e) {
       if (!mounted) return;
-      setState(() => _errorMessage = 'Could not load contacts.');
+      setState(() => _errorMessage = e.message);
+    } finally {
+      if (mounted) setState(() => _searching = false);
     }
-  }
-
-  List<Recipient> _filtered(List<Recipient> recipients) {
-    if (_query.trim().isEmpty) return recipients;
-    final query = _query.trim().toLowerCase();
-    return recipients
-        .where(
-          (r) =>
-              r.name.toLowerCase().contains(query) ||
-              r.subtitle.toLowerCase().contains(query),
-        )
-        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.75,
-      minChildSize: 0.5,
-      maxChildSize: 0.9,
+      initialChildSize: 0.5,
+      minChildSize: 0.35,
+      maxChildSize: 0.75,
       expand: false,
       builder: (context, scrollController) {
         return Container(
@@ -70,114 +66,93 @@ class _RecipientPickerSheetState extends ConsumerState<RecipientPickerSheet> {
               topRight: Radius.circular(24),
             ),
           ),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.cardBorder,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Select Recipient',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: TextField(
-                  onChanged: (value) => setState(() => _query = value),
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Search by name or email',
-                    hintStyle: const TextStyle(color: AppColors.textSecondary),
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      color: AppColors.textSecondary,
-                    ),
-                    filled: true,
-                    fillColor: AppColors.cardBackground,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: AppColors.cardBorder),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: AppColors.cardBorder),
-                    ),
+          child: SingleChildScrollView(
+            controller: scrollController,
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.cardBorder,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Expanded(child: _buildList(scrollController)),
-            ],
+                const SizedBox(height: 16),
+                const Text(
+                  'Send to',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        onSubmitted: (_) => _search(),
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: "Recipient's email",
+                          hintStyle: const TextStyle(color: AppColors.textSecondary),
+                          filled: true,
+                          fillColor: AppColors.cardBackground,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(color: AppColors.cardBorder),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(color: AppColors.cardBorder),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _searching ? null : _search,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.accentBlue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: _searching
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text('Find'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                if (_errorMessage != null)
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: AppColors.error),
+                  )
+                else if (_found != null)
+                  RecipientCard(
+                    recipient: _found!,
+                    showChevron: false,
+                    onTap: () => Navigator.pop(context, _found),
+                  ),
+              ],
+            ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _buildList(ScrollController scrollController) {
-    if (_errorMessage != null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              _errorMessage!,
-              style: const TextStyle(color: AppColors.textSecondary),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() => _errorMessage = null);
-                _load();
-              },
-              child: const Text(
-                'Retry',
-                style: TextStyle(color: AppColors.accentBlue),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final recipients = _recipients;
-    if (recipients == null) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.accentBlue),
-      );
-    }
-
-    final filtered = _filtered(recipients);
-    if (filtered.isEmpty) {
-      return const Center(
-        child: Text(
-          'No contacts match.',
-          style: TextStyle(color: AppColors.textSecondary),
-        ),
-      );
-    }
-
-    return ListView.separated(
-      controller: scrollController,
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-      itemCount: filtered.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final recipient = filtered[index];
-        return RecipientCard(
-          recipient: recipient,
-          showChevron: false,
-          onTap: () => Navigator.pop(context, recipient),
         );
       },
     );

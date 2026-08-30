@@ -1,7 +1,7 @@
 import 'package:fintech_wallet/app/main_navigation.dart';
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/topup/data/model/payment_method.dart';
-import 'package:fintech_wallet/features/topup/domain/repositories/topup_repository.dart';
+import 'package:fintech_wallet/features/transactions/domain/entities/transaction.dart';
 import 'package:fintech_wallet/shared/widgets/detail_row.dart';
 import 'package:fintech_wallet/shared/widgets/primary_button.dart';
 import 'package:fintech_wallet/shared/widgets/result_status_header.dart';
@@ -14,13 +14,14 @@ import '../provider/topup_provider.dart';
 /// [result] is a one-time navigation payload, not something `TopUpState`
 /// needs to keep carrying around afterward.
 class TopUpResultScreen extends ConsumerWidget {
-  final TopUpResult result;
+  final Transaction transaction;
 
-  const TopUpResultScreen({super.key, required this.result});
+  const TopUpResultScreen({super.key, required this.transaction});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(topUpProvider);
+    final symbol = TopUpNotifier.symbolFor(state.currency);
 
     PaymentMethod? method;
     for (final m in state.methods) {
@@ -30,12 +31,7 @@ class TopUpResultScreen extends ConsumerWidget {
       }
     }
 
-    // Same hardcoded $9,850.20 available-balance figure used everywhere
-    // else in this app (Dashboard/Wallet's `CustomCard`) — there's still no
-    // real wallet-balance API, so this is the mock starting point the
-    // top-up amount gets added to, matching the mockup's $9,850.20 + $100.00
-    // = $9,950.20 exactly.
-    final newBalance = 9850.20 + state.amount;
+    final newBalance = transaction.balanceAfter;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -60,7 +56,7 @@ class TopUpResultScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                '\$${state.amount.toStringAsFixed(2)}',
+                '$symbol${state.amount.toStringAsFixed(2)}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 40,
@@ -80,16 +76,28 @@ class TopUpResultScreen extends ConsumerWidget {
                   children: [
                     DetailRow(
                       label: 'New Balance',
-                      value: '\$${newBalance.toStringAsFixed(2)}',
+                      value: '$symbol${newBalance.toStringAsFixed(2)}',
                       valueColor: AppColors.accentBlue,
+                    ),
+                    Divider(
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      thickness: 0.4,
                     ),
                     DetailRow(
                       label: 'Source',
-                      value: method == null ? '—' : '${method.title} ${method.subtitle}',
+                      value: method == null
+                          ? '—'
+                          : '${method.title} ${method.subtitle}',
+                    ),
+                    Divider(
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      thickness: 0.4,
                     ),
                     DetailRow(
                       label: 'Reference ID',
-                      value: result.transactionId ?? '—',
+                      value: '#${transaction.id}',
                       valueColor: AppColors.accentBlue,
                     ),
                   ],
@@ -108,7 +116,9 @@ class TopUpResultScreen extends ConsumerWidget {
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(56),
                   side: const BorderSide(color: AppColors.cardBorder),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28),
+                  ),
                 ),
                 onPressed: () => Navigator.pushAndRemoveUntil(
                   context,
@@ -117,7 +127,10 @@ class TopUpResultScreen extends ConsumerWidget {
                 ),
                 child: const Text(
                   'Back to Home',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],

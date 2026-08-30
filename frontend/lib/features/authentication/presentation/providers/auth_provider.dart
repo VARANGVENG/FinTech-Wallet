@@ -71,6 +71,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> restoreSession() async {
+    try {
+      final user = await _repository.me();
+      state = state.copyWith(status: AuthStatus.success, user: user);
+    } catch (e) {
+      if (e is ApiException && e.statusCode == 401) {
+        await _repository.logout();
+        state = const AuthState();
+      }
+    }
+  }
+
   Future<void> logout() async {
     await _repository.logout();
     state = const AuthState();

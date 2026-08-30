@@ -22,8 +22,13 @@ class ApiEndpoints {
   static String transactionDetail(String id) => '/transactions/$id';
   static String reportTransactionIssue(String id) => '/transactions/$id/report';
 
-  // Transfers
+  // Wallet
   static const String defaultWallet = '/wallets/default';
+  static const String defaultWalletTransactions = '/wallets/default/transactions';
+  
+  // Users
+  static const String userSearch = '/users/search';
+  // Transfers
   static const String transfers = '/transfers';
 
   // Fraud alerts

@@ -1,7 +1,7 @@
 import 'package:fintech_wallet/app/constants.dart';
-import 'package:fintech_wallet/core/mock/mock_transaction_history.dart';
 import 'package:fintech_wallet/features/notifications/presentation/provider/notifications_provider.dart';
 import 'package:fintech_wallet/features/notifications/presentation/screen/notifications_screen.dart';
+import 'package:fintech_wallet/features/transactions/presentation/providers/transaction_history_provider.dart';
 import 'package:fintech_wallet/shared/widgets/custom_transaction_history_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,6 +34,7 @@ class BalanceOverviewScaffold extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final unreadCount = ref.watch(unreadNotificationCountProvider);
+    final transactionsAsync = ref.watch(transactionHistoryProvider);
     return Scaffold(
       appBar: AppBar(backgroundColor: AppColors.background),
       body: Container(
@@ -164,18 +165,45 @@ class BalanceOverviewScaffold extends ConsumerWidget {
                       topRight: Radius.circular(20),
                     ),
                   ),
-                  child: ListView.separated(
-                    itemCount: transactionHistory.length,
-                    separatorBuilder: (_, _) => const Divider(
-                      height: 2,
-                      indent: 30,
-                      endIndent: 30,
-                      color: AppColors.cardBorder,
-                    ),
-                    itemBuilder: (context, index) =>
-                        CustomTransactionHistoryItem(
-                          transaction: transactionHistory[index],
+                  child: transactionsAsync.when(
+                    data: (transactions) {
+                      if (transactions.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No transactions yet',
+                            style: TextStyle(
+                              color: AppColors.surface.withValues(alpha: 0.7),
+                            ),
+                          ),
+                        );
+                      }
+                      return ListView.separated(
+                        itemCount: transactions.length,
+                        separatorBuilder: (_, _) => const Divider(
+                          height: 3,
+                          indent: 30,
+                          endIndent: 30,
+                          color: AppColors.cardBorder,
                         ),
+                        itemBuilder: (context, index) =>
+                            CustomTransactionHistoryItem(
+                              transaction: transactions[index],
+                            ),
+                      );
+                    },
+                    loading: () => Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    error: (error, stackTrace) => Center(
+                      child: Text(
+                        "Couldn't load transactions",
+                        style: TextStyle(
+                          color: AppColors.surface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),

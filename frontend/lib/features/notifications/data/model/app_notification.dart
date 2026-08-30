@@ -1,4 +1,3 @@
-import 'package:fintech_wallet/features/dashboard/presentation/model/transaction_history_model.dart';
 import 'package:flutter/material.dart';
 
 enum NotificationCategory { alert, transaction }
@@ -15,7 +14,6 @@ class AppNotification {
   final DateTime timestamp;
   final IconData icon;
   final bool isRead;
-  final TransactionHistoryModel? transaction;
   final bool isFraudAlert;
 
   const AppNotification({
@@ -26,7 +24,6 @@ class AppNotification {
     required this.timestamp,
     required this.icon,
     this.isRead = false,
-    this.transaction,
     this.isFraudAlert = false,
   });
 
@@ -39,7 +36,6 @@ class AppNotification {
       timestamp: timestamp,
       icon: icon,
       isRead: isRead ?? this.isRead,
-      transaction: transaction,
       isFraudAlert: isFraudAlert,
     );
   }

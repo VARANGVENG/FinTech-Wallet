@@ -2,6 +2,8 @@ import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/topup/data/model/payment_method.dart';
 import 'package:fintech_wallet/features/topup/presentation/screen/topup_result_screen.dart';
 import 'package:fintech_wallet/features/topup/presentation/widget/payment_method_tile.dart';
+import 'package:fintech_wallet/features/transactions/presentation/providers/transaction_history_provider.dart';
+import 'package:fintech_wallet/features/wallet/presentation/providers/wallet_provider.dart';
 import 'package:fintech_wallet/shared/widgets/detail_row.dart';
 import 'package:fintech_wallet/shared/widgets/primary_button.dart';
 import 'package:fintech_wallet/shared/widgets/secure_badge.dart';
@@ -14,24 +16,31 @@ class ConfirmTopUpScreen extends ConsumerWidget {
 
   Future<void> _handleConfirm(BuildContext context, WidgetRef ref) async {
     final notifier = ref.read(topUpProvider.notifier);
-    final result = await notifier.submit();
+    final transaction = await notifier.submit();
     if (!context.mounted) return;
 
-    if (result != null && result.success) {
+    if (transaction != null) {
+      ref.invalidate(walletProvider);
+      ref.invalidate(transactionHistoryProvider);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => TopUpResultScreen(result: result)),
+        MaterialPageRoute(
+          builder: (_) => TopUpResultScreen(transaction: transaction),
+        ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result?.message ?? 'Something went wrong.')),
-      );
+      final message =
+          ref.read(topUpProvider).errorMessage ?? 'Something went wrong.';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(topUpProvider);
+    final symbol = TopUpNotifier.symbolFor(state.currency);
 
     PaymentMethod? method;
     for (final m in state.methods) {
@@ -99,7 +108,10 @@ class ConfirmTopUpScreen extends ConsumerWidget {
                               ),
                               Text(
                                 method.subtitle,
-                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                                style: const TextStyle(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 13,
+                                ),
                               ),
                             ],
                           ),
@@ -108,11 +120,14 @@ class ConfirmTopUpScreen extends ConsumerWidget {
                     const SizedBox(height: 20),
                     const Text(
                       'Amount',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '\$${state.amount.toStringAsFixed(2)}',
+                      '$symbol${state.amount.toStringAsFixed(2)}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 32,
@@ -122,10 +137,10 @@ class ConfirmTopUpScreen extends ConsumerWidget {
                     const SizedBox(height: 16),
                     const Divider(color: AppColors.cardBorder),
                     const SizedBox(height: 8),
-                    const DetailRow(label: 'Top-up fee', value: '\$0.00'),
+                    DetailRow(label: 'Top-up fee', value: '${symbol}0.00'),
                     DetailRow(
                       label: 'Total to pay',
-                      value: '\$${state.amount.toStringAsFixed(2)}',
+                      value: '$symbol${state.amount.toStringAsFixed(2)}',
                     ),
                     const DetailRow(
                       label: 'Arrives',

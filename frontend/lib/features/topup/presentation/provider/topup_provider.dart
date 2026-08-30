@@ -1,8 +1,11 @@
-import 'package:fintech_wallet/core/network/api_endpoints.dart';
-import 'package:fintech_wallet/features/topup/data/datasource/topup_remote_datasurce.dart';
+import 'package:fintech_wallet/core/errors/api_exception.dart';
+import 'package:fintech_wallet/core/providers/core_providers.dart';
+import 'package:fintech_wallet/features/topup/data/datasource/topup_remote_datasource.dart';
 import 'package:fintech_wallet/features/topup/data/model/payment_method.dart';
 import 'package:fintech_wallet/features/topup/data/repositories/topup_repository_impl.dart';
+import 'package:fintech_wallet/features/transactions/domain/entities/transaction.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import '../../domain/repositories/topup_repository.dart';
 
 /// Immutable snapshot of everything the Top-up screen needs to render.
@@ -17,15 +20,17 @@ class TopUpState {
   final bool loadingMethods;
   final bool submitting;
   final String? errorMessage;
+  final String idempotencyKey;
 
   const TopUpState({
-    this.amount = 100.0,
+    this.amount = 0.0,
     this.currency = 'USD',
     this.selectedMethod = PaymentMethodType.linkedBank,
     this.methods = const [],
     this.loadingMethods = true,
     this.submitting = false,
     this.errorMessage,
+    required this.idempotencyKey,
   });
 
   TopUpState copyWith({
@@ -36,6 +41,7 @@ class TopUpState {
     bool? loadingMethods,
     bool? submitting,
     String? errorMessage,
+    String? idempotencyKey,
   }) {
     return TopUpState(
       amount: amount ?? this.amount,
@@ -46,8 +52,9 @@ class TopUpState {
       submitting: submitting ?? this.submitting,
       // Matches AuthState's copyWith: errorMessage is NOT preserved with
       // `??` like the other fields — any call that doesn't explicitly pass
-      // it resets it to null. See the note below the code for why.
+      // it resets it to null.
       errorMessage: errorMessage,
+      idempotencyKey: idempotencyKey ?? this.idempotencyKey,
     );
   }
 }
@@ -58,10 +65,20 @@ class TopUpState {
 /// completely unchanged.
 class TopUpNotifier extends StateNotifier<TopUpState> {
   final TopUpRepository _repository;
+  final Uuid _uuid;
 
-  TopUpNotifier(this._repository) : super(const TopUpState());
+  TopUpNotifier(this._repository, this._uuid)
+    : super(TopUpState(idempotencyKey: _uuid.v4()));
 
-  static const quickAmounts = [25.0, 50.0, 100.0, 250.0];
+  static const Map<String, List<double>> quickAmountsByCurrency = {
+    'USD': [25.0, 50.0, 100.0, 250.0],
+    'KHR': [20000.0, 50000.0, 100000.0, 200000.0],
+  };
+
+  static List<double> quickAmountsFor(String currency) =>
+      quickAmountsByCurrency[currency] ?? quickAmountsByCurrency['USD']!;
+
+  static String symbolFor(String currency) => currency == 'KHR' ? '៛' : '\$';
 
   Future<void> loadPaymentMethods() async {
     state = state.copyWith(loadingMethods: true, errorMessage: null);
@@ -78,46 +95,52 @@ class TopUpNotifier extends StateNotifier<TopUpState> {
   }
 
   void setAmount(double value) {
-    state = state.copyWith(amount: value);
+    state = state.copyWith(amount: value, idempotencyKey: _uuid.v4());
+  }
+
+  void setCurrency(String currency) {
+    if (currency == state.currency) return;
+
+    state = state.copyWith(
+      currency: currency,
+      amount: quickAmountsFor(currency).first,
+      idempotencyKey: _uuid.v4(),
+    );
   }
 
   void selectMethod(PaymentMethodType type) {
-    state = state.copyWith(selectedMethod: type);
+    state = state.copyWith(selectedMethod: type, idempotencyKey: _uuid.v4());
   }
 
-  Future<TopUpResult?> submit() async {
+  Future<Transaction?> submit() async {
     if (state.selectedMethod == null) return null;
 
-    state = state.copyWith(submitting: true);
+    state = state.copyWith(submitting: false, errorMessage: null);
 
     try {
-      final result = await _repository.submitTopUp(
+      final transaction = await _repository.submitTopUp(
         amount: state.amount,
         currency: state.currency,
         method: state.selectedMethod!,
+        idempotencyKey: state.idempotencyKey,
       );
-      return result;
-    } catch (e) {
-      return const TopUpResult(
-        success: false,
-        message: 'Something went wrong.',
-      );
-    } finally {
-      state = state.copyWith(submitting: false);
+      return transaction;
+    } on ApiException catch (e) {
+      state = state.copyWith(errorMessage: e.message);
+      return null;
     }
   }
 }
 
 /// Builds the repository this feature depends on. Kept as its own provider
 /// (rather than constructed inline inside `topUpProvider`) so a test could
-/// override just this one piece — e.g. `topUpRepositoryProvider.overrideWithValue(FakeTopUpRepository())`
-/// — without touching `TopUpNotifier` at all.
+/// override just this one piece without touching `TopUpNotifier` at all.
 final topUpRepositoryProvider = Provider<TopUpRepository>((ref) {
-  final dataSource = HttpTopUpRemoteDataSource(baseUrl: ApiEndpoints.baseUrl);
-  return TopUpRepositoryImpl(dataSource);
+  final apiClient = ref.watch(apiClientProvider);
+  return TopUpRepositoryImpl(TopUpRemoteDataSource(apiClient));
 });
 
 final topUpProvider = StateNotifierProvider<TopUpNotifier, TopUpState>((ref) {
   final repository = ref.watch(topUpRepositoryProvider);
-  return TopUpNotifier(repository);
+  return TopUpNotifier(repository, Uuid());
 });

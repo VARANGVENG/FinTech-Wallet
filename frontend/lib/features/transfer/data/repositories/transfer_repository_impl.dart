@@ -1,50 +1,32 @@
-import 'package:fintech_wallet/features/transfer/data/model/wallet.dart';
-
+import 'package:fintech_wallet/features/transactions/domain/entities/transaction.dart';
 import '../datasource/transfer_remote_datasource.dart';
 import '../model/recipient.dart';
 import '../../domain/repositories/transfer_repository.dart';
 
-/// The "business logic" layer. This is where raw JSON becomes real domain
-/// objects, and where a failure gets turned into a meaningful [TransferResult]
-/// instead of crashing up through the provider — same role
-/// [TopUpRepositoryImpl] plays for Top-up.
 class TransferRepositoryImpl implements TransferRepository {
   final TransferRemoteDataSource _remote;
 
   TransferRepositoryImpl(this._remote);
 
   @override
-  Future<List<Recipient>> getRecipients() async {
-    final rawList = await _remote.fetchRecipients();
-    return rawList.map((json) => Recipient.fromJson(json)).toList();
+  Future<Recipient> findRecipient(String email) {
+    return _remote.findRecipient(email);
   }
 
   @override
-  Future<List<Wallet>> getWallets() async {
-    final rawList = await _remote.fetchWallets();
-    return rawList.map((json) => Wallet.fromJson(json)).toList();
-  }
-
-  @override
-  Future<TransferResult> submitTransfer({
-    required Recipient recipient,
+  Future<Transaction> submitTransfer({
+    required String recipientEmail,
     required double amount,
     required String currency,
+    required String idempotencyKey,
     String? note,
-  }) async {
-    final json = await _remote.postTransfer(
-      recipientId: recipient.id,
+  }) {
+    return _remote.submitTransfer(
+      recipientEmail: recipientEmail,
       amount: amount,
       currency: currency,
+      idempotencyKey: idempotencyKey,
       note: note,
-    );
-
-    // Exactly the kind of translation that belongs at the repository
-    // layer: raw JSON keys become a typed, null-safe domain object.
-    return TransferResult(
-      success: json['success'] as bool? ?? false,
-      message: json['message'] as String?,
-      reference: json['reference'] as String?,
     );
   }
 }

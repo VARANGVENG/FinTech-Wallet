@@ -1,14 +1,6 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:flutter/material.dart';
 
-/// The amount-entry card: "Amount" label + currency, an editable big-number
-/// field, and an available-balance line underneath.
-///
-/// Unlike `AmountInputCard` (Top-up's chip-based amount picker), this is a
-/// genuinely editable [TextField] — Transfer's mockup has no quick-amount
-/// chips, just free-typed entry. The `$` prefix is baked into the field's
-/// decoration rather than a separate `Text`, so it scrolls/aligns with
-/// whatever the user types instead of sitting as a static label.
 class AmountEntryCard extends StatelessWidget {
   final TextEditingController controller;
   final String currency;

@@ -52,6 +52,12 @@ class AuthRemoteDataSource {
     );
   }
 
+  Future<UserModel> me() async {
+    final response = await _apiClient.get(ApiEndpoints.me);
+
+    return UserModel.fromJson(response['user'] as Map<String, dynamic>);
+  }
+
   Future<void> logout() async {
     await _apiClient.post(ApiEndpoints.logout);
   }

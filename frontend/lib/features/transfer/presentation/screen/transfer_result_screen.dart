@@ -1,6 +1,6 @@
 import 'package:fintech_wallet/app/main_navigation.dart';
 import 'package:fintech_wallet/app/constants.dart';
-import 'package:fintech_wallet/features/transfer/domain/repositories/transfer_repository.dart';
+import 'package:fintech_wallet/features/transactions/domain/entities/transaction.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_card.dart';
 import 'package:fintech_wallet/shared/widgets/detail_row.dart';
 import 'package:fintech_wallet/shared/widgets/primary_button.dart';
@@ -10,15 +10,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../provider/transfer_provider.dart';
 
-/// Screen 3 of the Transfer flow — shown after `ConfirmTransferScreen`
-/// successfully calls `submit()`. Takes [result] directly as a constructor
-/// parameter rather than reading it from provider state: it's a one-time
-/// navigation payload for this screen alone, not ongoing feature state
-/// `TransferState` needs to keep carrying around afterward.
-class TransferResultScreen extends ConsumerWidget {
-  final TransferResult result;
 
-  const TransferResultScreen({super.key, required this.result});
+class TransferResultScreen extends ConsumerWidget {
+  final Transaction transaction;
+
+  const TransferResultScreen({super.key, required this.transaction});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -70,10 +66,15 @@ class TransferResultScreen extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
+                    DetailRow(
+                      label: 'New Balance',
+                      value: '\$${transaction.balanceAfter.toStringAsFixed(2)}',
+                      valueColor: AppColors.accentBlue,
+                    ),
                     DetailRow(label: 'Date', value: dateLabel),
                     DetailRow(
                       label: 'Reference ID',
-                      value: result.reference ?? '—',
+                      value: '#${transaction.id}',
                       valueColor: AppColors.accentBlue,
                     ),
                   ],

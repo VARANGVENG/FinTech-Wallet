@@ -1,18 +1,40 @@
 import 'package:fintech_wallet/app/constants.dart';
-import 'package:fintech_wallet/features/dashboard/presentation/model/transaction_history_model.dart';
+import 'package:fintech_wallet/features/transactions/domain/entities/transaction.dart';
 import 'package:fintech_wallet/shared/widgets/detail_row.dart';
 import 'package:fintech_wallet/shared/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 /// Shows the full detail of a single transaction — reached from a tapped
-/// transaction-category notification. Takes the exact same
-/// [TransactionHistoryModel] `HomeDashboardScreen`/`WalletScreen` already
-/// render, rather than a separate data shape invented just for this screen.
+/// row in the shared transaction list. Takes the same [Transaction] entity
+/// the list renders, rather than a separate data shape invented just for
+/// this screen.
 class TransactionDetailScreen extends StatelessWidget {
-  final TransactionHistoryModel transaction;
+  final Transaction transaction;
 
   const TransactionDetailScreen({super.key, required this.transaction});
+
+  static IconData _iconFor(TransactionType type) {
+    switch (type) {
+      case TransactionType.topup:
+        return Icons.add_circle_outline;
+      case TransactionType.transferIn:
+        return Icons.call_received;
+      case TransactionType.transferOut:
+        return Icons.call_made;
+    }
+  }
+
+  static String _titleFor(TransactionType type) {
+    switch (type) {
+      case TransactionType.topup:
+        return 'Top Up';
+      case TransactionType.transferIn:
+        return 'Transfer In';
+      case TransactionType.transferOut:
+        return 'Transfer Out';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +42,8 @@ class TransactionDetailScreen extends StatelessWidget {
     final statusText = isPending ? 'Pending' : 'Completed';
     final statusColor = isPending ? AppColors.warning : AppColors.success;
     final sign = transaction.isIncome ? '+' : '-';
-    final amountText = '$sign\$${transaction.amount.abs().toStringAsFixed(2)}';
+    final amountText = '$sign\$${transaction.amount.toStringAsFixed(2)}';
+    final description = transaction.description ?? 'No description';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -42,11 +65,15 @@ class TransactionDetailScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 32,
                 backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                child: Icon(transaction.icon, color: AppColors.primary, size: 28),
+                child: Icon(
+                  _iconFor(transaction.type),
+                  color: AppColors.primary,
+                  size: 28,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
-                transaction.title,
+                _titleFor(transaction.type),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -55,28 +82,40 @@ class TransactionDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                transaction.description,
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                description,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
+                ),
               ),
               const SizedBox(height: 20),
               Text(
                 amountText,
                 style: TextStyle(
-                  color: transaction.isIncome ? AppColors.success : Colors.white,
+                  color: transaction.isIncome
+                      ? AppColors.success
+                      : Colors.white,
                   fontSize: 36,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   statusText,
-                  style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               const SizedBox(height: 28),
@@ -90,17 +129,38 @@ class TransactionDetailScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    DetailRow(label: 'Status', value: statusText, valueColor: statusColor),
+                    DetailRow(
+                      label: 'Status',
+                      value: statusText,
+                      valueColor: statusColor,
+                    ),
+                    Divider(
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      thickness: 0.4,
+                    ),
                     DetailRow(
                       label: 'Date',
-                      value: DateFormat('MMM d, yyyy').format(transaction.transactionDate),
+                      value: DateFormat(
+                        'MMM d, yyyy,h:mm a',
+                      ).format(transaction.createdAt),
+                    ),
+                    Divider(
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      thickness: 0.4,
                     ),
                     DetailRow(
                       label: 'Reference ID',
-                      value: transaction.id,
-                      valueColor: AppColors.accentBlue,
+                      value: '${transaction.id}',
+                      valueColor: AppColors.surface,
                     ),
-                    DetailRow(label: 'Description', value: transaction.description),
+                    Divider(
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      thickness: 0.4,
+                    ),
+                    DetailRow(label: 'Description', value: description),
                   ],
                 ),
               ),

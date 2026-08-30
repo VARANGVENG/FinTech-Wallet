@@ -1,37 +1,35 @@
 import 'package:fintech_wallet/core/network/api_client.dart';
 import 'package:fintech_wallet/core/network/api_endpoints.dart';
 import 'package:fintech_wallet/features/transactions/data/models/transaction_model.dart';
-import '../model/recipient.dart';
+import '../model/payment_method.dart';
 
-class TransferRemoteDataSource {
+class TopUpRemoteDataSource {
   final ApiClient _apiClient;
 
-  TransferRemoteDataSource(this._apiClient);
+  TopUpRemoteDataSource(this._apiClient);
 
-  Future<Recipient> findRecipient(String email) async {
-    final response = await _apiClient.get(
-      ApiEndpoints.userSearch,
-      query: {'email': email},
-    );
+  Future<List<PaymentMethod>> getPaymentMethods() async {
+    final response = await _apiClient.get(ApiEndpoints.paymentMethods);
 
-    return Recipient.fromJson(response['user'] as Map<String, dynamic>);
+    final methods = response['methods'] as List;
+    return methods
+        .map((json) => PaymentMethod.fromJson(json as Map<String, dynamic>))
+        .toList();
   }
 
-  Future<TransactionModel> submitTransfer({
-    required String recipientEmail,
+  Future<TransactionModel> submitTopUp({
     required double amount,
     required String currency,
+    required PaymentMethodType method,
     required String idempotencyKey,
-    String? note,
   }) async {
     final response = await _apiClient.post(
-      ApiEndpoints.transfers,
+      ApiEndpoints.topups,
       body: {
-        'recipient_email': recipientEmail,
         'amount': amount,
         'currency': currency,
+        'method': method.name,
         'idempotency_key': idempotencyKey,
-        if (note != null && note.isNotEmpty) 'note': note,
       },
     );
 

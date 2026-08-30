@@ -1,4 +1,3 @@
-import 'package:fintech_wallet/core/mock/mock_transaction_history.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/mock/mock_alert_notifications.dart';
 import '../../data/model/app_notification.dart';
@@ -11,21 +10,7 @@ class NotificationsNotifier extends StateNotifier<List<AppNotification>> {
   NotificationsNotifier() : super(_buildInitial());
 
   static List<AppNotification> _buildInitial() {
-    final transactionNotifications = transactionHistory.map((t) {
-      return AppNotification(
-        id: 'txn_${t.id}',
-        category: NotificationCategory.transaction,
-        title: t.isIncome ? 'Money Received' : 'Transaction Completed',
-        message: t.isIncome
-            ? 'You received a payment from ${t.title}.'
-            : 'Your transaction at ${t.title} was completed.',
-        timestamp: t.transactionDate,
-        icon: t.icon,
-        transaction: t,
-      );
-    }).toList();
-
-    return [...mockAlertNotifications, ...transactionNotifications];
+    return [...mockAlertNotifications,];
   }
 
   /// Called once when `NotificationsScreen` opens — clears the unread

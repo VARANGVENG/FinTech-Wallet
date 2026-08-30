@@ -1,6 +1,8 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/features/transactions/presentation/providers/transaction_history_provider.dart';
 import 'package:fintech_wallet/features/transfer/presentation/screen/transfer_result_screen.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_card.dart';
+import 'package:fintech_wallet/features/wallet/presentation/providers/wallet_provider.dart';
 import 'package:fintech_wallet/shared/widgets/detail_row.dart';
 import 'package:fintech_wallet/shared/widgets/primary_button.dart';
 import 'package:fintech_wallet/shared/widgets/secure_badge.dart';
@@ -9,31 +11,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../provider/transfer_provider.dart';
 
-/// Screen 2 of the Transfer flow: review everything from `TransferScreen`
-/// before actually submitting. `submit()` is finally called here —
-/// `TransferScreen`'s "Continue" button only navigates to this screen now,
-/// it no longer submits directly.
-///
-/// `ConsumerWidget`, not `ConsumerStatefulWidget` — this screen has no
-/// local widget state or lifecycle needs (no controllers, no `initState`),
-/// it's purely reactive to `transferProvider`.
+
 class ConfirmTransferScreen extends ConsumerWidget {
   const ConfirmTransferScreen({super.key});
 
   Future<void> _handleConfirm(BuildContext context, WidgetRef ref) async {
     final notifier = ref.read(transferProvider.notifier);
-    final result = await notifier.submit();
+    final transaction = await notifier.submit();
     if (!context.mounted) return;
 
-    if (result != null && result.success) {
+    if (transaction != null) {
+      ref.invalidate(walletProvider);
+      ref.invalidate(transactionHistoryProvider);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => TransferResultScreen(result: result)),
+        MaterialPageRoute(
+          builder: (_) => TransferResultScreen(transaction: transaction),
+        ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result?.message ?? 'Something went wrong.')),
-      );
+      final message =
+          ref.read(transferProvider).errorMessage ?? 'Something went wrong.';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -42,6 +43,7 @@ class ConfirmTransferScreen extends ConsumerWidget {
     final state = ref.watch(transferProvider);
     final recipient = state.recipient;
     final dateLabel = DateFormat('MMM d, yyyy').format(DateTime.now());
+    final wallet = ref.watch(walletProvider).valueOrNull;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -84,16 +86,34 @@ class ConfirmTransferScreen extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    const DetailRow(label: 'From', value: 'NovaPay Wallet'),
-                    const DetailRow(
+                    DetailRow(
+                      label: 'From',
+                      value: wallet?.name ?? 'USD Wallet',
+                    ),
+                    Divider(
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      thickness: 0.4,
+                    ),
+                    DetailRow(
                       label: 'Available Balance',
-                      value: '\$3,850.20',
+                      value: '\$${(wallet?.balance ?? 0).toStringAsFixed(2)}',
+                    ),
+                    Divider(
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      thickness: 0.4,
                     ),
                     DetailRow(
                       label: 'Note',
                       value: (state.note != null && state.note!.isNotEmpty)
                           ? state.note!
                           : '—',
+                    ),
+                    Divider(
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      thickness: 0.4,
                     ),
                     DetailRow(label: 'Date', value: dateLabel),
                   ],

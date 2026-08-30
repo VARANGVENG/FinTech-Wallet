@@ -13,8 +13,10 @@ import 'amount_chip.dart';
 class AmountInputCard extends StatelessWidget {
   final double amount;
   final String currency;
+  final String currencySymbol;
   final List<double> quickAmounts;
   final TextEditingController controller;
+  final FocusNode focusNode;
   final ValueChanged<String> onAmountChanged;
   final ValueChanged<double> onQuickAmountSelected;
   final ValueChanged<String> onCurrencyTap;
@@ -23,8 +25,10 @@ class AmountInputCard extends StatelessWidget {
     super.key,
     required this.amount,
     required this.currency,
+    required this.currencySymbol,
     required this.quickAmounts,
     required this.controller,
+    required this.focusNode,
     required this.onAmountChanged,
     required this.onQuickAmountSelected,
     required this.onCurrencyTap,
@@ -59,7 +63,7 @@ class AmountInputCard extends StatelessWidget {
                     Text(
                       currency,
                       style: const TextStyle(
-                        color: AppColors.textPrimary,
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -77,6 +81,7 @@ class AmountInputCard extends StatelessWidget {
           const SizedBox(height: 8),
           TextField(
             controller: controller,
+            focusNode: focusNode,
             onChanged: onAmountChanged,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(
@@ -84,12 +89,12 @@ class AmountInputCard extends StatelessWidget {
               fontSize: 44,
               fontWeight: FontWeight.w800,
             ),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
               isDense: true,
               contentPadding: EdgeInsets.zero,
-              prefixText: '\$',
-              prefixStyle: TextStyle(
+              prefixText: currencySymbol,
+              prefixStyle: const TextStyle(
                 color: Colors.white,
                 fontSize: 44,
                 fontWeight: FontWeight.w800,
@@ -110,6 +115,7 @@ class AmountInputCard extends StatelessWidget {
                       ),
                       child: AmountChip(
                         amount: value,
+                         currencySymbol: currencySymbol,
                         isSelected: amount == value,
                         onTap: () => onQuickAmountSelected(value),
                       ),

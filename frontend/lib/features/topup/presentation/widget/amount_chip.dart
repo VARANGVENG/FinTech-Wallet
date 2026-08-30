@@ -1,5 +1,6 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 // import '../theme/app_colors.dart';
 
 /// A single tappable "$25 / $50 / $100 / $250" pill.
@@ -10,12 +11,14 @@ import 'package:flutter/material.dart';
 /// chip tracking its own selected flag, which would let them get out of sync.
 class AmountChip extends StatelessWidget {
   final double amount;
+  final String currencySymbol;
   final bool isSelected;
   final VoidCallback onTap;
 
   const AmountChip({
     super.key,
     required this.amount,
+    required this.currencySymbol,
     required this.isSelected,
     required this.onTap,
   });
@@ -37,11 +40,13 @@ class AmountChip extends StatelessWidget {
           color: isSelected ? AppColors.accentBlue : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isSelected ? AppColors.accentBlue : AppColors.chipUnselectedBorder,
+            color: isSelected
+                ? AppColors.accentBlue
+                : AppColors.chipUnselectedBorder,
           ),
         ),
         child: Text(
-          '\$${amount.toInt()}',
+          '$currencySymbol${NumberFormat.decimalPattern().format(amount.toInt())}',
           style: TextStyle(
             color: isSelected ? Colors.white : AppColors.textSecondary,
             fontWeight: FontWeight.w700,
