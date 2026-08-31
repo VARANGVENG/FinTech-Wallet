@@ -14,8 +14,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+    Route::get('/wallets', [WalletController::class, 'index'])->middleware('auth:sanctum');
     Route::get('/wallets/default', [WalletController::class, 'default'])->middleware('auth:sanctum');
     Route::get('/wallets/default/transactions', [TransactionController::class, 'index'])->middleware('auth:sanctum');
+    Route::get('/wallets/{currency}/transactions', [TransactionController::class, 'byCurrency'])->middleware('auth:sanctum');
 
     Route::get('/payment-methods', [TopUpController::class, 'methods'])->middleware('auth:sanctum');
     Route::post('/topups', [TopUpController::class, 'store'])->middleware('auth:sanctum');

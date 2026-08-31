@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\TransactionResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class TransactionController extends Controller
 {
@@ -13,8 +14,18 @@ class TransactionController extends Controller
     {
         $wallet = $request->user()->wallets()->where('is_default', true)->firstOrFail();
 
-        $paginator = $wallet->transactions()->latest()->paginate(20);
+        return $this->respondWithPage($wallet->transactions()->latest()->paginate(20));
+    }
 
+    public function byCurrency(Request $request, string $currency): JsonResponse
+    {
+        $wallet = $request->user()->wallets()->where('currency', $currency)->firstOrFail();
+
+        return $this->respondWithPage($wallet->transactions()->latest()->paginate(20));
+    }
+
+    private function respondWithPage(LengthAwarePaginator $paginator): JsonResponse
+    {
         return response()->json([
             'transactions' => TransactionResource::collection($paginator),
             'meta' => [
