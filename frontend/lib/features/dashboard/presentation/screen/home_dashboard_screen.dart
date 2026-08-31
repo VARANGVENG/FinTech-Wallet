@@ -42,6 +42,7 @@ class _HomeDashboardState extends ConsumerState<HomeDashboardScreen>
           totalBalance: wallet.balance,
           availableBalance: wallet.balance,
           pendingBalance: 0.0,
+          currency: wallet.currency,
         ),
         loading: () => const SizedBox(
           height: 180,

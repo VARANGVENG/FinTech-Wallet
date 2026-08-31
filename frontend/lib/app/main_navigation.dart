@@ -92,9 +92,7 @@ class _MainNavigationState extends State<MainNavigation> {
         child: CustomBottomNavigation(
           currentIndex: currentIndex,
           onTap: changePage,
-          onActionTap: () {
-            // TODO: wire up the center "+" button.
-          },
+          onActionTap: () {},
         ),
       ),
     );

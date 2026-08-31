@@ -11,4 +11,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
   Future<List<Transaction>> getDefaultWalletTransactions() async {
     return remoteDataSource.getDefaultWalletTransactions();
   }
+
+  @override
+  Future<List<Transaction>> getWalletTransactions(String currency) async {
+    return remoteDataSource.getWalletTransactions(currency);
+  }
 }

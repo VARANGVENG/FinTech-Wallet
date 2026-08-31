@@ -49,9 +49,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     final alerts = notifications
         .where((n) => n.category == NotificationCategory.alert)
         .toList();
-    final transactions = notifications
-        .where((n) => n.category == NotificationCategory.transaction)
-        .toList();
+    final transactionNotificationsAsync = ref.watch(
+      transactionNotificationsProvider,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -79,7 +79,19 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         controller: _tabController,
         children: [
           _NotificationList(notifications: alerts),
-          _NotificationList(notifications: transactions),
+          transactionNotificationsAsync.when(
+            data: (transactions) =>
+                _NotificationList(notifications: transactions),
+            loading: () => Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+            error: (error, stackTrace) => Center(
+              child: Text(
+                "Couldn't load transactions",
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -116,7 +128,7 @@ class _NotificationList extends StatelessWidget {
             context,
             MaterialPageRoute(builder: (_) => const FraudAlertScreen()),
           );
-        } 
+        }
         return NotificationTile(notification: notification, onTap: onTap);
       },
     );

@@ -2,6 +2,7 @@ import 'package:fintech_wallet/app/main_navigation.dart';
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/transactions/domain/entities/transaction.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_card.dart';
+import 'package:fintech_wallet/shared/utils/number_extensions.dart';
 import 'package:fintech_wallet/shared/widgets/detail_row.dart';
 import 'package:fintech_wallet/shared/widgets/primary_button.dart';
 import 'package:fintech_wallet/shared/widgets/result_status_header.dart';
@@ -9,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../provider/transfer_provider.dart';
-
 
 class TransferResultScreen extends ConsumerWidget {
   final Transaction transaction;
@@ -21,6 +21,7 @@ class TransferResultScreen extends ConsumerWidget {
     final state = ref.watch(transferProvider);
     final recipient = state.recipient;
     final dateLabel = DateFormat('MMM d, yyyy').format(DateTime.now());
+    final currency = state.currency;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -45,7 +46,7 @@ class TransferResultScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                '\$${state.amount.toStringAsFixed(2)}',
+                state.amount.toCurrency(currencyCode: currency),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 40,
@@ -68,10 +69,22 @@ class TransferResultScreen extends ConsumerWidget {
                   children: [
                     DetailRow(
                       label: 'New Balance',
-                      value: '\$${transaction.balanceAfter.toStringAsFixed(2)}',
+                      value: transaction.balanceAfter.toCurrency(
+                        currencyCode: currency,
+                      ),
                       valueColor: AppColors.accentBlue,
                     ),
+                    Divider(
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      thickness: 0.4,
+                    ),
                     DetailRow(label: 'Date', value: dateLabel),
+                    Divider(
+                      color: AppColors.textPrimary,
+                      height: 20,
+                      thickness: 0.4,
+                    ),
                     DetailRow(
                       label: 'Reference ID',
                       value: '#${transaction.id}',
@@ -81,19 +94,15 @@ class TransferResultScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 28),
-              PrimaryButton(
-                label: 'View Receipt',
-                onPressed: () {
-                  // TODO: navigate to a real transaction detail/receipt
-                  // screen once one exists.
-                },
-              ),
+              PrimaryButton(label: 'View Receipt', onPressed: () {}),
               const SizedBox(height: 12),
               OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(56),
                   side: const BorderSide(color: AppColors.cardBorder),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28),
+                  ),
                 ),
                 onPressed: () => Navigator.pushAndRemoveUntil(
                   context,
@@ -102,7 +111,10 @@ class TransferResultScreen extends ConsumerWidget {
                 ),
                 child: const Text(
                   'Back to Home',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],

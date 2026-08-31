@@ -11,6 +11,7 @@ import '../../domain/repositories/transfer_repository.dart';
 class TransferState {
   final Recipient? recipient;
   final double amount;
+  final String currency;
   final String? note;
   final bool submitting;
   final String? errorMessage;
@@ -19,6 +20,7 @@ class TransferState {
   const TransferState({
     this.recipient,
     this.amount = 0.0,
+    this.currency = 'USD',
     this.note,
     this.submitting = false,
     this.errorMessage,
@@ -28,6 +30,7 @@ class TransferState {
   TransferState copyWith({
     Recipient? recipient,
     double? amount,
+    String? currency,
     String? note,
     bool? submitting,
     String? errorMessage,
@@ -36,6 +39,7 @@ class TransferState {
     return TransferState(
       recipient: recipient ?? this.recipient,
       amount: amount ?? this.amount,
+      currency: currency ?? this.currency,
       note: note ?? this.note,
       submitting: submitting ?? this.submitting,
       errorMessage: errorMessage,
@@ -49,7 +53,7 @@ class TransferNotifier extends StateNotifier<TransferState> {
   final Uuid _uuid;
 
   TransferNotifier(this._repository, this._uuid)
-      : super(TransferState(idempotencyKey: _uuid.v4()));
+    : super(TransferState(idempotencyKey: _uuid.v4()));
 
   void setRecipient(Recipient recipient) {
     state = state.copyWith(recipient: recipient, idempotencyKey: _uuid.v4());
@@ -57,6 +61,16 @@ class TransferNotifier extends StateNotifier<TransferState> {
 
   void setAmount(double value) {
     state = state.copyWith(amount: value, idempotencyKey: _uuid.v4());
+  }
+
+  void setCurrency(String currency) {
+    if (currency == state.currency) return;
+
+    state = state.copyWith(
+      currency: currency,
+      amount: 0.0,
+      idempotencyKey: _uuid.v4(),
+    );
   }
 
   void setNote(String value) {
@@ -73,7 +87,7 @@ class TransferNotifier extends StateNotifier<TransferState> {
       final transaction = await _repository.submitTransfer(
         recipientEmail: recipient.email,
         amount: state.amount,
-        currency: 'USD',
+        currency: state.currency,
         idempotencyKey: state.idempotencyKey,
         note: state.note,
       );
@@ -91,7 +105,9 @@ final transferRepositoryProvider = Provider<TransferRepository>((ref) {
   return TransferRepositoryImpl(TransferRemoteDataSource(apiClient));
 });
 
-final transferProvider = StateNotifierProvider<TransferNotifier, TransferState>((ref) {
-  final repository = ref.watch(transferRepositoryProvider);
-  return TransferNotifier(repository, Uuid());
-});
+final transferProvider = StateNotifierProvider<TransferNotifier, TransferState>(
+  (ref) {
+    final repository = ref.watch(transferRepositoryProvider);
+    return TransferNotifier(repository, Uuid());
+  },
+);

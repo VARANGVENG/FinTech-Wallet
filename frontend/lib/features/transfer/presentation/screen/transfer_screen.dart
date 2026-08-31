@@ -5,6 +5,7 @@ import 'package:fintech_wallet/features/transfer/presentation/widget/amount_entr
 import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_card.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_picker_sheet.dart';
 import 'package:fintech_wallet/features/transfer/presentation/widget/recipient_select_prompt.dart';
+import 'package:fintech_wallet/features/wallet/domain/entities/wallet.dart';
 import 'package:fintech_wallet/features/wallet/presentation/providers/wallet_provider.dart';
 import 'package:fintech_wallet/shared/widgets/custom_text_field.dart';
 import 'package:fintech_wallet/shared/widgets/primary_button.dart';
@@ -60,16 +61,61 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     }
   }
 
+  Future<void> _handleCurrencyTap(
+    BuildContext context,
+    List<Wallet> wallets,
+    String currentCurrency,
+  ) async {
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppColors.cardBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final wallet in wallets)
+                ListTile(
+                  title: Text(
+                    wallet.currency,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  trailing: wallet.currency == currentCurrency
+                      ? const Icon(Icons.check, color: AppColors.accentBlue)
+                      : null,
+                  onTap: () => Navigator.pop(context, wallet.currency),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected == null || !context.mounted) return;
+    ref.read(transferProvider.notifier).setCurrency(selected);
+    _amountController.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final state = ref.watch(transferProvider);
     final notifier = ref.read(transferProvider.notifier);
-    // TODO: suspended for demo speed — Transfer is USD-only for now, so this
-    // always reads the default (USD) wallet. Restoring the currency picker
-    // means reading whichever currency is selected instead. See KHR-wallet
-    // -visibility backlog.
-    final availableBalance = ref.watch(walletProvider).valueOrNull?.balance ?? 0;
+    final wallets = ref.watch(walletsProvider).valueOrNull ?? const <Wallet>[];
+    Wallet? selectedWallet;
+    for (final wallet in wallets) {
+      if (wallet.currency == state.currency) {
+        selectedWallet = wallet;
+        break;
+      }
+    }
+    selectedWallet ??= wallets.isNotEmpty ? wallets.first : null;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -109,11 +155,12 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
               const SizedBox(height: 24),
               AmountEntryCard(
                 controller: _amountController,
-                currency: 'USD',
-                availableBalance: availableBalance,
+                currency: state.currency,
+                availableBalance: selectedWallet?.balance ?? 0,
                 onAmountChanged: (value) =>
                     notifier.setAmount(double.tryParse(value) ?? 0),
-                onCurrencyTap: (_) {},
+                onCurrencyTap: (current) =>
+                    _handleCurrencyTap(context, wallets, current),
               ),
               const SizedBox(height: 24),
               const Text(

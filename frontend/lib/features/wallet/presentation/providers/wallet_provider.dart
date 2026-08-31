@@ -20,3 +20,13 @@ final walletProvider = FutureProvider<Wallet>((ref) {
   final repository = ref.watch(walletRepositoryProvider);
   return repository.getDefaultWallet();
 });
+
+final walletsProvider = FutureProvider<List<Wallet>>((ref) {
+  final authState = ref.watch(authProvider);
+  if (authState.user == null) {
+    throw StateError('No authenticated user');
+  }
+
+  final repository = ref.watch(walletRepositoryProvider);
+  return repository.getWallets();
+});

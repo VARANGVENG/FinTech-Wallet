@@ -20,3 +20,14 @@ final transactionHistoryProvider = FutureProvider<List<Transaction>>((ref) {
   final repository = ref.watch(transactionRepositoryProvider);
   return repository.getDefaultWalletTransactions();
 });
+
+final walletTransactionsProvider =
+    FutureProvider.family<List<Transaction>, String>((ref, currency) {
+      final authState = ref.watch(authProvider);
+      if (authState.user == null) {
+        throw StateError('No authenticated user');
+      }
+
+      final repository = ref.watch(transactionRepositoryProvider);
+      return repository.getWalletTransactions(currency);
+    });

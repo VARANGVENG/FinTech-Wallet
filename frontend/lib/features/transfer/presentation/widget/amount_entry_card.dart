@@ -1,4 +1,5 @@
 import 'package:fintech_wallet/app/constants.dart';
+import 'package:fintech_wallet/shared/utils/number_extensions.dart';
 import 'package:flutter/material.dart';
 
 class AmountEntryCard extends StatelessWidget {
@@ -16,6 +17,8 @@ class AmountEntryCard extends StatelessWidget {
     required this.onAmountChanged,
     required this.onCurrencyTap,
   });
+
+  static String _symbolFor(String currency) => currency == 'KHR' ? '៛' : '\$';
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +50,11 @@ class AmountEntryCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const Icon(Icons.keyboard_arrow_down, color: AppColors.textPrimary, size: 18),
+                    const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColors.textPrimary,
+                      size: 18,
+                    ),
                   ],
                 ),
               ),
@@ -63,11 +70,11 @@ class AmountEntryCard extends StatelessWidget {
               fontSize: 44,
               fontWeight: FontWeight.w800,
             ),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: InputBorder.none,
               isDense: true,
               contentPadding: EdgeInsets.zero,
-              prefixText: '\$',
+              prefixText: _symbolFor(currency),
               prefixStyle: TextStyle(
                 color: Colors.white,
                 fontSize: 44,
@@ -77,8 +84,11 @@ class AmountEntryCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Available Balance: \$${availableBalance.toStringAsFixed(2)}',
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            'Available Balance: ${availableBalance.toCurrency(currencyCode: currency)}',
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 13,
+            ),
           ),
         ],
       ),

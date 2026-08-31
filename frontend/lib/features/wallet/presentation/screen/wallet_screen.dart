@@ -1,5 +1,6 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/topup/presentation/screen/topup_screen.dart';
+import 'package:fintech_wallet/features/wallet/domain/entities/wallet.dart';
 import 'package:fintech_wallet/shared/widgets/balance_overview_scaffold.dart';
 import 'package:fintech_wallet/shared/widgets/custom_card.dart';
 import 'package:fintech_wallet/shared/widgets/custome_quick_actions_item.dart';
@@ -16,27 +17,123 @@ class WalletScreen extends ConsumerStatefulWidget {
 
 class _WalletPageState extends ConsumerState<WalletScreen>
     with AutomaticKeepAliveClientMixin {
-
+  String? _selectedCurrency;
   @override
   bool get wantKeepAlive => true;
+
+  Wallet _resolveSelected(List<Wallet> wallets) {
+    if (_selectedCurrency != null) {
+      for (final wallet in wallets) {
+        if (wallet.currency == _selectedCurrency) return wallet;
+      }
+    }
+    for (final wallet in wallets) {
+      if (wallet.isDefault) return wallet;
+    }
+    return wallets.first;
+  }
+
+  Future<void> _handleCurrencyTap(
+    BuildContext context,
+    List<Wallet> wallets,
+    String currentCurrency,
+  ) async {
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppColors.cardBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final wallet in wallets)
+                ListTile(
+                  title: Text(
+                    wallet.currency,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  trailing: wallet.currency == currentCurrency
+                      ? const Icon(Icons.check, color: AppColors.accentBlue)
+                      : null,
+                  onTap: () => Navigator.pop(context, wallet.currency),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected == null || !context.mounted) return;
+    setState(() => _selectedCurrency = selected);
+  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final walletAsync = ref.watch(walletProvider);
+    final walletsAsync = ref.watch(walletsProvider);
 
     return BalanceOverviewScaffold(
       headerTitle: 'My Walllet',
       headerTitleFontSize: 25,
-      balanceCard: walletAsync.when(
-        data: (wallet) => CustomCard(
-          balanceType: wallet.name,
-          cardType: 'Visa',
-          cardNumber: '**** **** **** 1234',
-          totalBalance: wallet.balance,
-          availableBalance: wallet.balance,
-          pendingBalance: 0.0,
-        ),
+
+      walletCurrency: walletsAsync.valueOrNull != null
+          ? _resolveSelected(walletsAsync.value!).currency
+          : null,
+      balanceCard: walletsAsync.when(
+        data: (wallets) {
+          final selected = _resolveSelected(wallets);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (wallets.length > 1) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () => _handleCurrencyTap(
+                        context,
+                        wallets,
+                        selected.currency,
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            selected.currency,
+                            style: const TextStyle(
+                              color: AppColors.surface,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: AppColors.surface,
+                            size: 18,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+              ],
+              CustomCard(
+                balanceType: selected.name,
+                cardType: 'Visa',
+                cardNumber: '**** **** **** 1234',
+                totalBalance: selected.balance,
+                availableBalance: selected.balance,
+                pendingBalance: 0.0,
+                currency: selected.currency,
+              ),
+            ],
+          );
+        },
         loading: () => const SizedBox(
           height: 180,
           child: Center(

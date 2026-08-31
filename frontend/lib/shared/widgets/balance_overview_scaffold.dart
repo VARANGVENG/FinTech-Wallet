@@ -2,15 +2,11 @@ import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/notifications/presentation/provider/notifications_provider.dart';
 import 'package:fintech_wallet/features/notifications/presentation/screen/notifications_screen.dart';
 import 'package:fintech_wallet/features/transactions/presentation/providers/transaction_history_provider.dart';
+import 'package:fintech_wallet/features/wallet/presentation/providers/wallet_provider.dart';
 import 'package:fintech_wallet/shared/widgets/custom_transaction_history_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Shared page shell for Dashboard and Wallet — both screens are the same
-/// "avatar/title + notification bell, balance card, quick actions,
-/// section header, scrollable transaction list" layout with different data.
-/// Each caller supplies the four things that actually differ; everything
-/// else (background, spacing, the transaction list itself) lives here once.
 class BalanceOverviewScaffold extends ConsumerWidget {
   final Widget? headerLeading;
   final String headerTitle;
@@ -19,6 +15,7 @@ class BalanceOverviewScaffold extends ConsumerWidget {
   final Widget balanceCard;
   final List<Widget> quickActions;
   final String sectionTitle;
+  final String? walletCurrency;
 
   const BalanceOverviewScaffold({
     super.key,
@@ -29,12 +26,18 @@ class BalanceOverviewScaffold extends ConsumerWidget {
     required this.balanceCard,
     required this.quickActions,
     required this.sectionTitle,
+    this.walletCurrency,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final unreadCount = ref.watch(unreadNotificationCountProvider);
-    final transactionsAsync = ref.watch(transactionHistoryProvider);
+    final currency = walletCurrency;
+    final transactionsAsync = currency == null
+        ? ref.watch(transactionHistoryProvider)
+        : ref.watch(walletTransactionsProvider(currency));
+    final currencyCode =
+        ref.watch(walletProvider).valueOrNull?.currency ?? 'USD';
     return Scaffold(
       appBar: AppBar(backgroundColor: AppColors.background),
       body: Container(
@@ -188,6 +191,7 @@ class BalanceOverviewScaffold extends ConsumerWidget {
                         itemBuilder: (context, index) =>
                             CustomTransactionHistoryItem(
                               transaction: transactions[index],
+                              currencyCode: currencyCode,
                             ),
                       );
                     },

@@ -104,13 +104,7 @@ class TopUpResultScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 28),
-              PrimaryButton(
-                label: 'View Receipt',
-                onPressed: () {
-                  // TODO: navigate to a real transaction detail/receipt
-                  // screen once one exists.
-                },
-              ),
+              PrimaryButton(label: 'View Receipt', onPressed: () {}),
               const SizedBox(height: 12),
               OutlinedButton(
                 style: OutlinedButton.styleFrom(

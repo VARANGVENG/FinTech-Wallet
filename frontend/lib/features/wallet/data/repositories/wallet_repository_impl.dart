@@ -11,4 +11,9 @@ class WalletRepositoryImpl implements WalletRepository {
   Future<Wallet> getDefaultWallet() async {
     return remoteDataSource.getDefaultWallet();
   }
+
+  @override
+  Future<List<Wallet>> getWallets() async {
+    return remoteDataSource.getWallets();
+  }
 }

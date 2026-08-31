@@ -1,12 +1,17 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 class ApiEndpoints {
   ApiEndpoints._(); // static-only namespace, never instantiated
 
-  // Android emulator only: 10.0.2.2 is a special alias the emulator maps
-  // to the host machine's own 127.0.0.1 — so `php artisan serve` (which
-  // binds 127.0.0.1:8000 by default) is reachable as-is, no --host flag
-  // needed. This will need to change for a physical device (host's LAN IP)
-  // or iOS simulator (localhost works directly there).
-  static const String baseUrl = 'http://10.0.2.2:8000/api/v1';
+  // Android emulator: 10.0.2.2 is a special alias the emulator maps to the
+  // host machine's own 127.0.0.1 — so `php artisan serve` (which binds
+  // 127.0.0.1:8000 by default) is reachable as-is, no --host flag needed.
+  // Flutter web runs in a real browser, which has no such alias — there,
+  // `localhost` (the host machine itself) is what actually reaches it.
+  // This will need to change again for a physical device (host's LAN IP)
+  // or iOS simulator (localhost works directly there, same as web).
+  static String get baseUrl =>
+      kIsWeb ? 'http://localhost:8000/api/v1' : 'http://10.0.2.2:8000/api/v1';
 
   // Auth
   static const String register = '/register';
@@ -23,8 +28,10 @@ class ApiEndpoints {
   static String reportTransactionIssue(String id) => '/transactions/$id/report';
 
   // Wallet
+  static const String wallets = '/wallets';
   static const String defaultWallet = '/wallets/default';
   static const String defaultWalletTransactions = '/wallets/default/transactions';
+  static String walletTransactions(String currency) => '/wallets/$currency/transactions';
   
   // Users
   static const String userSearch = '/users/search';

@@ -1,15 +1,21 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/transactions/domain/entities/transaction.dart';
 import 'package:fintech_wallet/features/transactions/presentation/screen/transaction_detail_screen.dart';
+import 'package:fintech_wallet/shared/utils/number_extensions.dart';
 import 'package:flutter/material.dart';
 
 class CustomTransactionHistoryItem extends StatelessWidget {
   final Transaction transaction;
+  final String currencyCode;
 
-  const CustomTransactionHistoryItem({super.key, required this.transaction});
+  const CustomTransactionHistoryItem({
+    super.key,
+    required this.transaction,
+    this.currencyCode = 'USD',
+  });
 
   static const Color _creditColor = Color(0xFF3DDC84);
-  static const Color _debitColor = Colors.white;
+  static const Color _debitColor = Color(0xFFE53935);
   static const Color _pendingColor = Color(0xFFE8A33D);
   static const Color _completedColor = Color(0xFF3DDC84);
 
@@ -57,7 +63,8 @@ class CustomTransactionHistoryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final amountColor = transaction.isIncome ? _creditColor : _debitColor;
     final sign = transaction.isIncome ? '+' : '-';
-    final amountText = '$sign\$${transaction.amount.toStringAsFixed(2)}';
+    final amountText =
+        '$sign${transaction.amount.toCurrency(currencyCode: currencyCode)}';
 
     final isPending = transaction.status == TransactionStatus.pending;
     final statusText = isPending ? 'Pending' : 'Completed';
@@ -67,7 +74,10 @@ class CustomTransactionHistoryItem extends StatelessWidget {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => TransactionDetailScreen(transaction: transaction),
+          builder: (_) => TransactionDetailScreen(
+            transaction: transaction,
+            currencyCode: currencyCode,
+          ),
         ),
       ),
       child: Padding(
@@ -106,12 +116,7 @@ class CustomTransactionHistoryItem extends StatelessWidget {
                 ),
               ],
             ),
-
-            // Pushes the left block and right block apart, filling all
-            // remaining space regardless of how long title/amount are.
             const Spacer(),
-
-            // Amount + status (right side)
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.min,

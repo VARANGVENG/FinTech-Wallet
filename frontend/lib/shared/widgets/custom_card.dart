@@ -7,6 +7,7 @@ class CustomCard extends StatelessWidget {
   final double totalBalance;
   final double availableBalance;
   final double pendingBalance;
+  final String currency;
   final String? cardNumber;
   final String? cardType;
   const CustomCard({
@@ -15,6 +16,7 @@ class CustomCard extends StatelessWidget {
     required this.totalBalance,
     required this.availableBalance,
     required this.pendingBalance,
+    this.currency = 'USD',
     this.cardNumber,
     this.cardType,
   });
@@ -66,7 +68,7 @@ class CustomCard extends StatelessWidget {
                 ),
               ),
             Text(
-              totalBalance.toCurrency(),
+              totalBalance.toCurrency(currencyCode: currency),
               style: TextStyle(
                 fontWeight: FontWeight.w900,
                 fontSize: 35,
@@ -79,14 +81,14 @@ class CustomCard extends StatelessWidget {
                 Text('Available', style: TextStyle(color: AppColors.surface)),
                 SizedBox(width: 10),
                 Text(
-                  availableBalance.toCurrency(),
+                  availableBalance.toCurrency(currencyCode: currency),
                   style: TextStyle(color: AppColors.surface),
                 ),
                 Spacer(),
                 Text('Pending', style: TextStyle(color: AppColors.surface)),
                 SizedBox(width: 10),
                 Text(
-                  pendingBalance.toCurrency(),
+                  pendingBalance.toCurrency(currencyCode: currency),
                   style: TextStyle(color: AppColors.surface),
                 ),
               ],

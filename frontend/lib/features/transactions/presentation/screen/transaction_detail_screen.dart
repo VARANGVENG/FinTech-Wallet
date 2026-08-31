@@ -1,5 +1,6 @@
 import 'package:fintech_wallet/app/constants.dart';
 import 'package:fintech_wallet/features/transactions/domain/entities/transaction.dart';
+import 'package:fintech_wallet/shared/utils/number_extensions.dart';
 import 'package:fintech_wallet/shared/widgets/detail_row.dart';
 import 'package:fintech_wallet/shared/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,13 @@ import 'package:intl/intl.dart';
 /// this screen.
 class TransactionDetailScreen extends StatelessWidget {
   final Transaction transaction;
+  final String currencyCode;
 
-  const TransactionDetailScreen({super.key, required this.transaction});
+  const TransactionDetailScreen({
+    super.key,
+    required this.transaction,
+    this.currencyCode = 'USD',
+  });
 
   static IconData _iconFor(TransactionType type) {
     switch (type) {
@@ -42,7 +48,8 @@ class TransactionDetailScreen extends StatelessWidget {
     final statusText = isPending ? 'Pending' : 'Completed';
     final statusColor = isPending ? AppColors.warning : AppColors.success;
     final sign = transaction.isIncome ? '+' : '-';
-    final amountText = '$sign\$${transaction.amount.toStringAsFixed(2)}';
+    final amountText =
+        '$sign${transaction.amount.toCurrency(currencyCode: currencyCode)}';
     final description = transaction.description ?? 'No description';
 
     return Scaffold(
@@ -165,13 +172,7 @@ class TransactionDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 28),
-              PrimaryButton(
-                label: 'Report an Issue',
-                onPressed: () {
-                  // TODO: wire this up once dispute/fraud reporting exists
-                  // — ties back to the deprioritized Fraud Alert feature.
-                },
-              ),
+              PrimaryButton(label: 'Report an Issue', onPressed: () {}),
             ],
           ),
         ),
