@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTopUpRequest;
 use App\Http\Resources\TransactionResource;
+use App\Jobs\SendPushNotificationJob;
 use App\Models\Transaction;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
@@ -83,6 +84,19 @@ class TopUpController extends Controller
             }
             throw $e;
         }
+
+        // Only reached on a genuine first-time success - both idempotency
+        // short-circuits above (the pre-check and the race-loser recovery)
+        // return early, so a retried/duplicate request never re-sends this.
+        // Queued (not called directly): notification delivery is a side
+        // effect of this already-committed transaction, not part of it, and
+        // must never make this response wait on Google/FCM.
+        SendPushNotificationJob::dispatch(
+            $request->user(),
+            'Top-up successful',
+            "Your wallet was topped up with {$amount} {$currency}.",
+            ['type' => 'topup', 'amount' => $amount, 'currency' => $currency],
+        );
 
         return response()->json([
             'transaction' => new TransactionResource($transaction),

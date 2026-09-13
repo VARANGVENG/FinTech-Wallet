@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Services\PushNotificationService;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -276,5 +277,63 @@ class TransferTest extends TestCase
         $this->assertNotNull($lockingQuery, 'Expected a lockForUpdate query to appear in the query log.');
         $sql = strtolower($lockingQuery['query']);
         $this->assertStringContainsString('order by', $sql, 'The locking query must use ORDER BY to guarantee a deterministic lock order.');
+    }
+
+    public function test_successful_transfer_sends_a_push_notification_to_both_recipient_and_sender(): void
+    {
+        $sender = User::factory()->create();
+        Wallet::factory()->for($sender)->create(['currency' => 'USD', 'balance' => 100, 'is_default' => true]);
+
+        $recipient = User::factory()->create();
+        Wallet::factory()->for($recipient)->create(['currency' => 'USD', 'balance' => 0, 'is_default' => true]);
+
+        // TransferController sends two distinct pushes per successful transfer
+        // - one to the recipient ("Money received"), one to the sender
+        // ("Transfer sent") - so both need their own expectation. A single
+        // ->once()->withArgs(...) constrained to only the recipient left the
+        // second (sender) call matching nothing, which Mockery treats as an
+        // unexpected call.
+        $mock = $this->mock(PushNotificationService::class);
+        $mock->shouldReceive('sendToUser')
+            ->once()
+            ->withArgs(fn ($user, $title) => $user->is($recipient) && $title === 'Money received');
+        $mock->shouldReceive('sendToUser')
+            ->once()
+            ->withArgs(fn ($user, $title) => $user->is($sender) && $title === 'Transfer sent');
+
+        Sanctum::actingAs($sender);
+
+        $this->postJson('/api/v1/transfers', [
+            'recipient_email' => $recipient->email,
+            'amount' => 10,
+            'currency' => 'USD',
+            'idempotency_key' => (string) Str::uuid(),
+        ])->assertStatus(201);
+    }
+
+    public function test_idempotent_replay_of_a_transfer_does_not_resend_a_push_notification(): void
+    {
+        $sender = User::factory()->create();
+        Wallet::factory()->for($sender)->create(['currency' => 'USD', 'balance' => 100, 'is_default' => true]);
+
+        $recipient = User::factory()->create();
+        Wallet::factory()->for($recipient)->create(['currency' => 'USD', 'balance' => 0, 'is_default' => true]);
+
+        // Two legitimate pushes happen on the one real request below (recipient
+        // + sender); ->twice() asserts the idempotent replay adds no further
+        // sends, not that only one push is sent overall.
+        $this->mock(PushNotificationService::class)->shouldReceive('sendToUser')->twice();
+
+        Sanctum::actingAs($sender);
+
+        $body = [
+            'recipient_email' => $recipient->email,
+            'amount' => 10,
+            'currency' => 'USD',
+            'idempotency_key' => (string) Str::uuid(),
+        ];
+
+        $this->postJson('/api/v1/transfers', $body)->assertStatus(201);
+        $this->postJson('/api/v1/transfers', $body)->assertStatus(200);
     }
 }
