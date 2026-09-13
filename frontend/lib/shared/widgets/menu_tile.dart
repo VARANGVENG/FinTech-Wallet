@@ -36,7 +36,7 @@ class MenuTile extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: (textColor ?? AppColors.textPrimary).withValues(
+                  color: (textColor ?? Colors.white).withValues(
                     alpha: 0.1,
                   ),
                   borderRadius: BorderRadius.circular(10),
@@ -53,7 +53,7 @@ class MenuTile extends StatelessWidget {
               child: Text(
                 title,
                 style: TextStyle(
-                  color: textColor ?? AppColors.textPrimary,
+                  color: textColor ?? Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
