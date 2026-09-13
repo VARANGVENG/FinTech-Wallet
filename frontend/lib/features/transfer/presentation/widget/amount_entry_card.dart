@@ -37,7 +37,7 @@ class AmountEntryCard extends StatelessWidget {
             children: [
               const Text(
                 'Amount',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
+                style: TextStyle(color: Colors.white, fontSize: 15),
               ),
               GestureDetector(
                 onTap: () => onCurrencyTap(currency),
@@ -46,13 +46,13 @@ class AmountEntryCard extends StatelessWidget {
                     Text(
                       currency,
                       style: const TextStyle(
-                        color: AppColors.textPrimary,
+                        color: Colors.white,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const Icon(
                       Icons.keyboard_arrow_down,
-                      color: AppColors.textPrimary,
+                      color: Colors.white,
                       size: 18,
                     ),
                   ],
@@ -86,7 +86,7 @@ class AmountEntryCard extends StatelessWidget {
           Text(
             'Available Balance: ${availableBalance.toCurrency(currencyCode: currency)}',
             style: const TextStyle(
-              color: AppColors.textSecondary,
+              color: Colors.white,
               fontSize: 13,
             ),
           ),
