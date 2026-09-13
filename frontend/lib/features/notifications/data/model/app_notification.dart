@@ -14,6 +14,11 @@ class AppNotification {
   final IconData icon;
   final bool isRead;
   final bool isFraudAlert;
+  /// Null for anything that isn't a monetary in/out event (alerts like
+  /// "Payment Declined" have no direction) - true/false only for actual
+  /// transaction money movement, so NotificationTile knows when it's even
+  /// meaningful to color the amount.
+  final bool? isIncome;
 
   const AppNotification({
     required this.id,
@@ -24,6 +29,7 @@ class AppNotification {
     required this.icon,
     this.isRead = false,
     this.isFraudAlert = false,
+    this.isIncome,
   });
 
   factory AppNotification.fromTransaction(
@@ -41,20 +47,23 @@ class AppNotification {
       timestamp: transaction.createdAt,
       icon: _iconForType(transaction.type),
       isRead: true,
+      isIncome: transaction.isIncome,
     );
   }
 
   /// Built from a live FCM push (foreground message, or a background/
   /// terminated tap) - the backend sends `type` in the data payload so the
-  /// same icon convention as [fromTransaction] can apply here too.
+  /// same icon/direction convention as [fromTransaction] can apply here too.
   factory AppNotification.fromPush(RemoteMessage message) {
+    final type = message.data['type'] as String?;
     return AppNotification(
       id: message.messageId ?? DateTime.now().microsecondsSinceEpoch.toString(),
       category: NotificationCategory.alert,
       title: message.notification?.title ?? 'Notification',
       message: message.notification?.body ?? '',
       timestamp: DateTime.now(),
-      icon: _iconForPushType(message.data['type'] as String?),
+      icon: _iconForPushType(type),
+      isIncome: _isIncomeForPushType(type),
     );
   }
 
@@ -68,6 +77,18 @@ class AppNotification {
         return Icons.call_made;
       default:
         return Icons.notifications_outlined;
+    }
+  }
+
+  static bool? _isIncomeForPushType(String? type) {
+    switch (type) {
+      case 'topup':
+      case 'transfer_in':
+        return true;
+      case 'transfer_out':
+        return false;
+      default:
+        return null;
     }
   }
 
@@ -103,6 +124,7 @@ class AppNotification {
       icon: icon,
       isRead: isRead ?? this.isRead,
       isFraudAlert: isFraudAlert,
+      isIncome: isIncome,
     );
   }
 }

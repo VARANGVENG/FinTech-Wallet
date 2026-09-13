@@ -10,6 +10,13 @@ class AppColors {
   static const warning = Color(0xFFFFAB00);
   static const error = Color(0xFFFF5630);
 
+  // Same green/red CustomTransactionHistoryItem already uses for
+  // incoming/outgoing amounts (Wallet screen, Home dashboard) - named here
+  // so NotificationTile can match it exactly instead of duplicating the
+  // hex values.
+  static const income = Color(0xFF3DDC84);
+  static const expense = Color(0xFFE53935);
+
   // static const background = Color(0xFFF4F5F7);
   static const background = Color.fromARGB(255, 7, 22, 49);
   static const surface = Colors.white;

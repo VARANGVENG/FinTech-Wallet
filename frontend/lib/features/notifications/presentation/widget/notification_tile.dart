@@ -11,6 +11,20 @@ class NotificationTile extends StatelessWidget {
 
   const NotificationTile({super.key, required this.notification, this.onTap});
 
+  /// Same convention as CustomTransactionHistoryItem (Wallet screen, Home
+  /// dashboard): green for money in, red for money out. Alerts have no
+  /// direction (isIncome is null there), so they keep the plain text color.
+  Color get _messageColor {
+    switch (notification.isIncome) {
+      case true:
+        return AppColors.income;
+      case false:
+        return AppColors.expense;
+      case null:
+        return AppColors.surface;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -61,8 +75,11 @@ class NotificationTile extends StatelessWidget {
                     notification.message,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: _messageColor,
+                      fontWeight: notification.isIncome != null
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                       fontSize: 13,
                     ),
                   ),
