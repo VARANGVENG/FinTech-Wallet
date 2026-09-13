@@ -108,7 +108,7 @@ class ConfirmTopUpScreen extends ConsumerWidget {
                               Text(
                                 method.title,
                                 style: const TextStyle(
-                                  color: AppColors.textPrimary,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16,
                                 ),

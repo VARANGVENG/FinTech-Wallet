@@ -120,7 +120,7 @@ class ConfirmTransferScreen extends ConsumerWidget {
                       value: wallet?.name ?? 'USD Wallet',
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),
@@ -131,7 +131,7 @@ class ConfirmTransferScreen extends ConsumerWidget {
                       ),
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),
@@ -142,7 +142,7 @@ class ConfirmTransferScreen extends ConsumerWidget {
                           : '—',
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),

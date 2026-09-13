@@ -50,7 +50,7 @@ class RecipientCard extends StatelessWidget {
                   Text(
                     recipient.fullName,
                     style: const TextStyle(
-                      color: AppColors.textPrimary,
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
