@@ -69,7 +69,7 @@ class AmountInputCard extends StatelessWidget {
                     ),
                     const Icon(
                       Icons.keyboard_arrow_down,
-                      color: AppColors.textPrimary,
+                      color: Colors.white,
                       size: 18,
                     ),
                   ],

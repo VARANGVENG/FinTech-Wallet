@@ -75,7 +75,7 @@ class PaymentMethodTile extends StatelessWidget {
                   Text(
                     method.title,
                     style: const TextStyle(
-                      color: AppColors.textPrimary,
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),

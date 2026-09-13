@@ -122,6 +122,15 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
+        // TransferScreen doubles as a bottom-nav tab (MainNavigation's
+        // PageView) and as a pushed route (the Home dashboard's "Transfer"
+        // quick action) - an unconditional BackButton renders in both, but
+        // only does anything in the second: it calls Navigator.maybePop,
+        // which silently no-ops when there's no route to pop back to (the
+        // tab case). Only show it where it can actually do something.
+        leading: Navigator.canPop(context)
+            ? const BackButton(color: Colors.white)
+            : null,
         centerTitle: true,
         title: const Text(
           'Transfer',

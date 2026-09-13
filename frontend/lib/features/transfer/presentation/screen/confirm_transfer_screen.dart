@@ -22,9 +22,15 @@ class ConfirmTransferScreen extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (transaction != null) {
+      final currency = ref.read(transferProvider).currency;
       ref.invalidate(walletProvider);
       ref.invalidate(walletsProvider);
+      // transactionHistoryProvider only ever caches the *default* wallet's
+      // history - transferring in any other currency would otherwise leave
+      // that currency's cached history stale until something else (or a
+      // hot reload) recreated it.
       ref.invalidate(transactionHistoryProvider);
+      ref.invalidate(walletTransactionsProvider(currency));
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -73,7 +79,6 @@ class ConfirmTransferScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        elevation: 0,
         centerTitle: true,
         leading: const BackButton(color: Colors.white),
         title: const Text(
@@ -115,7 +120,7 @@ class ConfirmTransferScreen extends ConsumerWidget {
                       value: wallet?.name ?? 'USD Wallet',
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),
@@ -126,7 +131,7 @@ class ConfirmTransferScreen extends ConsumerWidget {
                       ),
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),
@@ -137,7 +142,7 @@ class ConfirmTransferScreen extends ConsumerWidget {
                           : '—',
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),

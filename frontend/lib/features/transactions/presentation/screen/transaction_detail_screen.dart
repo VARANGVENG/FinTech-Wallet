@@ -142,7 +142,7 @@ class TransactionDetailScreen extends StatelessWidget {
                       valueColor: statusColor,
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),
@@ -153,7 +153,7 @@ class TransactionDetailScreen extends StatelessWidget {
                       ).format(transaction.createdAt),
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),
@@ -163,7 +163,7 @@ class TransactionDetailScreen extends StatelessWidget {
                       valueColor: AppColors.surface,
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),

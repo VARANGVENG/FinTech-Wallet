@@ -74,13 +74,13 @@ class TransferResultScreen extends ConsumerWidget {
                       valueColor: AppColors.accentBlue,
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),
                     DetailRow(label: 'Date', value: dateLabel),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),

@@ -30,7 +30,7 @@ class SettingsSwitchTile extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.textPrimary.withValues(alpha: 0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: AppColors.textSecondary, size: 18),
@@ -43,7 +43,7 @@ class SettingsSwitchTile extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
-                    color: AppColors.textPrimary,
+                    color: Colors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),

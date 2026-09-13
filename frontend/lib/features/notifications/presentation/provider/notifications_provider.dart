@@ -1,5 +1,4 @@
 import 'package:fintech_wallet/features/transactions/presentation/providers/transaction_history_provider.dart';
-import 'package:fintech_wallet/features/wallet/presentation/providers/wallet_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/mock/mock_alert_notifications.dart';
 import '../../data/model/app_notification.dart';
@@ -32,32 +31,27 @@ final unreadNotificationCountProvider = Provider<int>((ref) {
   final notifications = ref.watch(notificationsProvider);
   return notifications.where((n) => !n.isRead).length;
 });
-final transactionNotificationsProvider =
-    Provider<AsyncValue<List<AppNotification>>>((ref) {
-      final currencyCode =
-          ref.watch(walletProvider).valueOrNull?.currency ?? 'USD';
-      // transactionHistoryProvider paginates (infinite scroll - see its own
-      // state) for the dashboard's history list; this tab only ever shows
-      // whatever's already loaded, matching this screen's behavior before
-      // pagination existed.
-      final state = ref.watch(transactionHistoryProvider);
+/// Parameterized by currency (one wallet's history at a time, same model
+/// WalletScreen already uses) rather than always the default wallet -
+/// Transaction itself carries no currency of its own, so whichever wallet's
+/// history this reads is also what labels every row.
+final transactionNotificationsProvider = Provider.family<
+    AsyncValue<List<AppNotification>>, String>((ref, currency) {
+  final state = ref.watch(walletTransactionsProvider(currency));
 
-      if (state.isLoading) return const AsyncValue.loading();
-      if (state.error != null) {
-        return AsyncValue.error(
-          state.error!,
-          state.stackTrace ?? StackTrace.current,
-        );
-      }
+  if (state.isLoading) return const AsyncValue.loading();
+  if (state.error != null) {
+    return AsyncValue.error(
+      state.error!,
+      state.stackTrace ?? StackTrace.current,
+    );
+  }
 
-      return AsyncValue.data(
-        state.transactions
-            .map(
-              (t) => AppNotification.fromTransaction(
-                t,
-                currencyCode: currencyCode,
-              ),
-            )
-            .toList(),
-      );
-    });
+  return AsyncValue.data(
+    state.transactions
+        .map(
+          (t) => AppNotification.fromTransaction(t, currencyCode: currency),
+        )
+        .toList(),
+  );
+});

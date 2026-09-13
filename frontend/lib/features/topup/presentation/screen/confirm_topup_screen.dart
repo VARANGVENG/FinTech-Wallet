@@ -20,8 +20,15 @@ class ConfirmTopUpScreen extends ConsumerWidget {
     if (!context.mounted) return;
 
     if (transaction != null) {
+      final currency = ref.read(topUpProvider).currency;
       ref.invalidate(walletProvider);
+      ref.invalidate(walletsProvider);
+      // transactionHistoryProvider only ever caches the *default* wallet's
+      // history - topping up any other currency wallet would otherwise
+      // leave that currency's cached history stale until something else
+      // (or a hot reload) recreated it.
       ref.invalidate(transactionHistoryProvider);
+      ref.invalidate(walletTransactionsProvider(currency));
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -101,7 +108,7 @@ class ConfirmTopUpScreen extends ConsumerWidget {
                               Text(
                                 method.title,
                                 style: const TextStyle(
-                                  color: AppColors.textPrimary,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16,
                                 ),

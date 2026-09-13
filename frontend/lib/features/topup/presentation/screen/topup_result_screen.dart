@@ -80,7 +80,7 @@ class TopUpResultScreen extends ConsumerWidget {
                       valueColor: AppColors.accentBlue,
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),
@@ -91,7 +91,7 @@ class TopUpResultScreen extends ConsumerWidget {
                           : '${method.title} ${method.subtitle}',
                     ),
                     Divider(
-                      color: AppColors.textPrimary,
+                      color: AppColors.cardBorder,
                       height: 20,
                       thickness: 0.4,
                     ),
