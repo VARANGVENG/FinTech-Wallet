@@ -1,4 +1,6 @@
 import 'package:fintech_wallet/core/providers/core_providers.dart';
+import 'package:fintech_wallet/core/services/push_notification_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/model/app_settings.dart';
 import '../../data/repositories/settings_repository_impl.dart';
@@ -12,8 +14,9 @@ import '../../domain/repositories/settings_repository.dart';
 /// failure worth showing an error for.
 class SettingsNotifier extends StateNotifier<AppSettings> {
   final SettingsRepository _repository;
+  final PushNotificationService _pushService;
 
-  SettingsNotifier(this._repository) : super(const AppSettings());
+  SettingsNotifier(this._repository, this._pushService) : super(const AppSettings());
 
   /// Called once from the screen's `initState`, same convention as
   /// `loadPaymentMethods`/`loadRecipient`.
@@ -22,8 +25,28 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 
   Future<void> setPushNotifications(bool value) async {
+    final previousState = state;
     state = state.copyWith(pushNotifications: value);
     await _repository.saveSettings(state);
+
+    try {
+      if (value) {
+        await _pushService.registerToken();
+      } else {
+        await _pushService.unregisterToken();
+      }
+    } catch (e) {
+      // Unlike AuthNotifier's silent push wrappers - where push registration
+      // is a side effect of a login that already succeeded on its own terms
+      // - this switch's entire displayed meaning is "is push registered".
+      // Swallowing the failure the same way would leave it showing "on"
+      // while no device token is actually registered, so instead the
+      // setting is rolled back to what it was before: the switch visibly
+      // snaps back rather than trusting a state that isn't true.
+      debugPrint('SettingsNotifier: push notification registration failed: $e');
+      state = previousState;
+      await _repository.saveSettings(state);
+    }
   }
 
   Future<void> setTransactionAlerts(bool value) async {
@@ -49,5 +72,6 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
 
 final settingsProvider = StateNotifierProvider<SettingsNotifier, AppSettings>((ref) {
   final repository = ref.watch(settingsRepositoryProvider);
-  return SettingsNotifier(repository);
+  final pushService = ref.watch(pushNotificationServiceProvider);
+  return SettingsNotifier(repository, pushService);
 });
