@@ -23,6 +23,15 @@ class CustomBottomNavigation extends StatelessWidget {
   static const Color _activeColor = Color(0xFF4C7CFF);
   static const Color _inactiveColor = Color(0xFF8A8D9F);
 
+  /// This bar's own height (the SizedBox below) plus its bottom padding -
+  /// everything except the device's safe-area inset, which SafeArea adds on
+  /// top of that at render time. Scaffold.extendBody makes page content run
+  /// full-height behind this floating bar, so anything that scrolls (e.g.
+  /// BalanceOverviewScaffold's transaction list) needs to reserve at least
+  /// this much space (plus MediaQuery.of(context).padding.bottom) at its
+  /// end, or its last item(s) end up hidden underneath the bar.
+  static const double contentHeight = 100 + 12;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(

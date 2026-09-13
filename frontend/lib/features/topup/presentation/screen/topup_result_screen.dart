@@ -39,7 +39,7 @@ class TopUpResultScreen extends ConsumerWidget {
         backgroundColor: AppColors.background,
         elevation: 0,
         centerTitle: true,
-        leading: const BackButton(color: Colors.white),
+        automaticallyImplyLeading: false,
         title: const Text(
           'Top-up Result',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
