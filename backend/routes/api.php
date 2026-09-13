@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\TransferController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\DeviceTokenController;
 use App\Http\Controllers\Api\V1\TopUpController;
 use App\Http\Controllers\Api\V1\TransactionController;
 use App\Http\Controllers\Api\V1\WalletController;
@@ -24,4 +25,7 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/users/search', [UserController::class, 'search'])->middleware('auth:sanctum');
     Route::post('/transfers', [TransferController::class, 'store'])->middleware('auth:sanctum');
+
+    Route::post('/device-tokens', [DeviceTokenController::class, 'store'])->middleware('auth:sanctum');
+    Route::delete('/device-tokens', [DeviceTokenController::class, 'destroy'])->middleware('auth:sanctum');
 });

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Services\PushNotificationService;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -226,5 +227,45 @@ class TopUpTest extends TestCase
         } catch (QueryException $e) {
             $this->assertEquals(1062, (int) ($e->errorInfo[1] ?? 0));
         }
+    }
+
+    public function test_successful_topup_sends_a_push_notification(): void
+    {
+        $user = User::factory()->create();
+        Wallet::factory()->for($user)->create(['currency' => 'USD', 'balance' => 0, 'is_default' => true]);
+
+        $this->mock(PushNotificationService::class)
+            ->shouldReceive('sendToUser')
+            ->once()
+            ->withArgs(fn ($u) => $u->is($user));
+
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/v1/topups', [
+            'amount' => 25,
+            'currency' => 'USD',
+            'method' => 'linkedBank',
+            'idempotency_key' => (string) Str::uuid(),
+        ])->assertStatus(201);
+    }
+
+    public function test_idempotent_replay_of_a_topup_does_not_resend_a_push_notification(): void
+    {
+        $user = User::factory()->create();
+        Wallet::factory()->for($user)->create(['currency' => 'USD', 'balance' => 0, 'is_default' => true]);
+
+        $this->mock(PushNotificationService::class)->shouldReceive('sendToUser')->once();
+
+        Sanctum::actingAs($user);
+
+        $body = [
+            'amount' => 25,
+            'currency' => 'USD',
+            'method' => 'linkedBank',
+            'idempotency_key' => (string) Str::uuid(),
+        ];
+
+        $this->postJson('/api/v1/topups', $body)->assertStatus(201);
+        $this->postJson('/api/v1/topups', $body)->assertStatus(200);
     }
 }

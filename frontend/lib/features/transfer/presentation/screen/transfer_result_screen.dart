@@ -27,9 +27,8 @@ class TransferResultScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        elevation: 0,
         centerTitle: true,
-        leading: const BackButton(color: Colors.white),
+        automaticallyImplyLeading: false,
         title: const Text(
           'Transfer Result',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),

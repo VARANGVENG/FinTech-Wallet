@@ -1,6 +1,6 @@
-import '../entities/transaction.dart';
+import '../entities/transaction_page.dart';
 
 abstract class TransactionRepository {
-  Future<List<Transaction>> getDefaultWalletTransactions();
-  Future<List<Transaction>> getWalletTransactions(String currency);
+  Future<TransactionPage> getDefaultWalletTransactions({int page = 1});
+  Future<TransactionPage> getWalletTransactions(String currency, {int page = 1});
 }

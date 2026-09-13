@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase config - contains project identifiers, generated per-developer
+# from your own Firebase console (see the push notification setup steps)
+/android/app/google-services.json

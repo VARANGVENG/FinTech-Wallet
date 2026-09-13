@@ -8,9 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// `ConsumerStatefulWidget`, not `ConsumerWidget` — needs `initState` for
 /// two things a stateless widget can't do: owning the `TabController`
-/// (requires a `vsync`, tied to this widget's lifecycle) and the one-time
-/// `markAllAsRead()` call, same "load/act once" convention every other
-/// screen's `initState` already follows.
+/// (requires a `vsync`, tied to this widget's lifecycle) and reacting to
+/// which tab is actually active to decide when `markAllAsRead()` runs.
 class NotificationsScreen extends ConsumerStatefulWidget {
   final int initialTabIndex;
   const NotificationsScreen({super.key, this.initialTabIndex = 0});
@@ -22,6 +21,8 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     with SingleTickerProviderStateMixin {
+  static const _alertsTabIndex = 0;
+
   late final TabController _tabController;
 
   @override
@@ -32,13 +33,30 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       vsync: this,
       initialIndex: widget.initialTabIndex,
     );
+    _tabController.addListener(_markAlertsReadIfAlertsTabActive);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(notificationsProvider.notifier).markAllAsRead();
+      _markAlertsReadIfAlertsTabActive();
     });
+  }
+
+  /// Alerts should only be marked read once the user is actually looking at
+  /// the Alerts tab — not merely because this screen mounted. Without this,
+  /// opening straight to the Transactions tab (e.g. the "See all" link on
+  /// the dashboard, which passes `initialTabIndex: 1`) would silently clear
+  /// the Alerts unread badge for alerts the user never saw.
+  /// `indexIsChanging` is true only mid-animation when a tab is tapped
+  /// (not while the user is dragging the page view), so this fires once the
+  /// tab actually settles rather than on every intermediate tick.
+  void _markAlertsReadIfAlertsTabActive() {
+    if (_tabController.indexIsChanging) return;
+    if (_tabController.index == _alertsTabIndex) {
+      ref.read(notificationsProvider.notifier).markAllAsRead();
+    }
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_markAlertsReadIfAlertsTabActive);
     _tabController.dispose();
     super.dispose();
   }

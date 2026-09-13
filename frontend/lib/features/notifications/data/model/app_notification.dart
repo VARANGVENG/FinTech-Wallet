@@ -1,5 +1,6 @@
 import 'package:fintech_wallet/features/transactions/domain/entities/transaction.dart';
 import 'package:fintech_wallet/shared/utils/number_extensions.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 enum NotificationCategory { alert, transaction }
@@ -41,6 +42,33 @@ class AppNotification {
       icon: _iconForType(transaction.type),
       isRead: true,
     );
+  }
+
+  /// Built from a live FCM push (foreground message, or a background/
+  /// terminated tap) - the backend sends `type` in the data payload so the
+  /// same icon convention as [fromTransaction] can apply here too.
+  factory AppNotification.fromPush(RemoteMessage message) {
+    return AppNotification(
+      id: message.messageId ?? DateTime.now().microsecondsSinceEpoch.toString(),
+      category: NotificationCategory.alert,
+      title: message.notification?.title ?? 'Notification',
+      message: message.notification?.body ?? '',
+      timestamp: DateTime.now(),
+      icon: _iconForPushType(message.data['type'] as String?),
+    );
+  }
+
+  static IconData _iconForPushType(String? type) {
+    switch (type) {
+      case 'topup':
+        return Icons.add_circle_outline;
+      case 'transfer_in':
+        return Icons.call_received;
+         case 'transfer_out':
+        return Icons.call_made;
+      default:
+        return Icons.notifications_outlined;
+    }
   }
 
   static IconData _iconForType(TransactionType type) {

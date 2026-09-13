@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTransferRequest;
 use App\Http\Resources\TransactionResource;
+use App\Jobs\SendPushNotificationJob;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
@@ -126,6 +127,26 @@ class TransferController extends Controller
             }
             throw $e;
         }
+
+        // Only reached on a genuine first-time success - both idempotency
+        // short-circuits above (the pre-check and the race-loser recovery)
+        // return early, so a retried/duplicate request never re-sends this.
+        // Queued (not called directly): notification delivery is a side
+        // effect of this already-committed transaction, not part of it, and
+        // must never make this response wait on Google/FCM.
+        SendPushNotificationJob::dispatch(
+            $recipient,
+            'Money received',
+            "You received {$amount} {$currency} from {$sender->full_name}.",
+            ['type' => 'transfer_in', 'amount' => $amount, 'currency' => $currency],
+        );
+
+        SendPushNotificationJob::dispatch(
+            $sender,
+            'Transfer sent',
+            "You sent {$amount} {$currency} to {$recipient->full_name}.",
+            ['type' => 'transfer_out', 'amount' => $amount, 'currency' => $currency],
+        );
 
         return response()->json([
             'transaction' => new TransactionResource($outTransaction),

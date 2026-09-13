@@ -1,8 +1,11 @@
 
+import 'package:fintech_wallet/core/navigation/navigator_key.dart';
 import 'package:fintech_wallet/core/network/api_client.dart';
 import 'package:fintech_wallet/core/network/auth_interceptor.dart';
+import 'package:fintech_wallet/core/services/push_notification_service.dart';
 import 'package:fintech_wallet/core/storage/local_storage_service.dart';
 import 'package:fintech_wallet/core/storage/secure_storage_service.dart';
+import 'package:fintech_wallet/features/notifications/data/datasource/device_token_remote_datasource.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// [LocalStorageService.create] is async, so this provider can't build the
@@ -36,4 +39,15 @@ final apiClientProvider = Provider<ApiClient>((ref) {
     },
   );
   return ApiClient(authInterceptor: authInterceptor);
+});
+
+final deviceTokenRemoteDataSourceProvider = Provider<DeviceTokenRemoteDataSource>((ref) {
+  return DeviceTokenRemoteDataSource(ref.watch(apiClientProvider));
+});
+
+final pushNotificationServiceProvider = Provider<PushNotificationService>((ref) {
+  return PushNotificationService(
+    ref.watch(deviceTokenRemoteDataSourceProvider),
+    navigatorKey: navigatorKey,
+  );
 });

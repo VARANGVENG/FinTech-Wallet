@@ -44,4 +44,7 @@ class ApiEndpoints {
 
   // Profile & settings
   static const String settings = '/settings';
+
+  // Push notifications
+  static const String deviceTokens = '/device-tokens';
 }

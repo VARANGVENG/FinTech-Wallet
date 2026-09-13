@@ -1,6 +1,6 @@
 {
-    "name": "fintech_wallet",
-    "short_name": "fintech_wallet",
+    "name": "Novapay",
+    "short_name": "Novapay",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -14,6 +14,13 @@ class NotificationsNotifier extends StateNotifier<List<AppNotification>> {
   void markAllAsRead() {
     state = [for (final n in state) n.copyWith(isRead: true)];
   }
+
+  /// Inserts a notification built from a live FCM push so it shows up in
+  /// the Alerts tab immediately - only needed for the foreground case,
+  /// since the app isn't running to update this state otherwise.
+  void addPushNotification(AppNotification notification) {
+    state = [notification, ...state];
+  }
 }
 
 final notificationsProvider =
@@ -29,16 +36,28 @@ final transactionNotificationsProvider =
     Provider<AsyncValue<List<AppNotification>>>((ref) {
       final currencyCode =
           ref.watch(walletProvider).valueOrNull?.currency ?? 'USD';
-      return ref
-          .watch(transactionHistoryProvider)
-          .whenData(
-            (txns) => txns
-                .map(
-                  (t) => AppNotification.fromTransaction(
-                    t,
-                    currencyCode: currencyCode,
-                  ),
-                )
-                .toList(),
-          );
+      // transactionHistoryProvider paginates (infinite scroll - see its own
+      // state) for the dashboard's history list; this tab only ever shows
+      // whatever's already loaded, matching this screen's behavior before
+      // pagination existed.
+      final state = ref.watch(transactionHistoryProvider);
+
+      if (state.isLoading) return const AsyncValue.loading();
+      if (state.error != null) {
+        return AsyncValue.error(
+          state.error!,
+          state.stackTrace ?? StackTrace.current,
+        );
+      }
+
+      return AsyncValue.data(
+        state.transactions
+            .map(
+              (t) => AppNotification.fromTransaction(
+                t,
+                currencyCode: currencyCode,
+              ),
+            )
+            .toList(),
+      );
     });

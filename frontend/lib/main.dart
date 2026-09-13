@@ -1,14 +1,28 @@
 import 'package:fintech_wallet/app/main_navigation.dart';
+import 'package:fintech_wallet/core/navigation/navigator_key.dart';
 import 'package:fintech_wallet/core/providers/core_providers.dart';
+import 'package:fintech_wallet/core/services/push_notification_service.dart';
 import 'package:fintech_wallet/core/storage/local_storage_service.dart';
 import 'package:fintech_wallet/features/authentication/presentation/providers/auth_provider.dart';
 import 'package:fintech_wallet/features/authentication/presentation/screen/login_screen.dart';
 import 'package:fintech_wallet/features/authentication/presentation/screen/splash_screen.dart';
+import 'package:fintech_wallet/features/notifications/presentation/provider/notifications_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+  // firebase_messaging isn't implemented on every platform Firebase itself
+  // supports here (see PushNotificationService.isSupportedPlatform) -
+  // registering its background handler on one that lacks the plugin would
+  // throw before this app ever reaches runApp().
+  if (PushNotificationService.isSupportedPlatform) {
+    FirebaseMessaging.onBackgroundMessage(firebaseBackgroundMessageHandler);
+  }
 
   final localStorage = await LocalStorageService.create();
 
@@ -26,6 +40,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamilyFallback: const ['NotoSansKhmer']),
       home: const _StartupGate(),
@@ -52,6 +67,13 @@ class _StartupGateState extends ConsumerState<_StartupGate> {
   void initState() {
     super.initState();
     _isLoggedIn = _resolveInitialRoute();
+
+    // Fire-and-forget: requesting notification permission shouldn't block
+    // the splash screen while the user decides on the system dialog.
+    ref.read(pushNotificationServiceProvider).initialize(
+      onForegroundMessage: (notification) =>
+          ref.read(notificationsProvider.notifier).addPushNotification(notification),
+    );
   }
 
   Future<bool> _resolveInitialRoute() async {

@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "fintech_wallet" "\0"
+            VALUE "FileDescription", "Novapay" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "fintech_wallet" "\0"
+            VALUE "InternalName", "Novapay" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "fintech_wallet.exe" "\0"
-            VALUE "ProductName", "fintech_wallet" "\0"
+            VALUE "ProductName", "Novapay" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
