@@ -2,12 +2,12 @@ name: Backend Tests
 
 on:
   pull_request:
-    branches: [main, develop, feature/topup]
+    branches: [main, develop]
     paths:
       - 'backend/**'
       - '.github/workflows/backend-tests.yml'
   push:
-    branches: [main, develop, feature/topup]
+    branches: [main, develop,]
     paths:
       - 'backend/**'
       - '.github/workflows/backend-tests.yml'
