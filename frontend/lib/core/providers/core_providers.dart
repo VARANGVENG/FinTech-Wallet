@@ -1,7 +1,11 @@
 
+import 'package:fintech_wallet/core/biometrics/data/datasource/biometric_local_datasource.dart';
+import 'package:fintech_wallet/core/biometrics/data/repositories/biometric_repository_impl.dart';
+import 'package:fintech_wallet/core/biometrics/domain/repositories/biometric_repository.dart';
 import 'package:fintech_wallet/core/navigation/navigator_key.dart';
 import 'package:fintech_wallet/core/network/api_client.dart';
 import 'package:fintech_wallet/core/network/auth_interceptor.dart';
+import 'package:fintech_wallet/core/services/biometric_auth_service.dart';
 import 'package:fintech_wallet/core/services/push_notification_service.dart';
 import 'package:fintech_wallet/core/storage/local_storage_service.dart';
 import 'package:fintech_wallet/core/storage/secure_storage_service.dart';
@@ -50,4 +54,21 @@ final pushNotificationServiceProvider = Provider<PushNotificationService>((ref) 
     ref.watch(deviceTokenRemoteDataSourceProvider),
     navigatorKey: navigatorKey,
   );
+});
+
+final biometricAuthServiceProvider = Provider<BiometricAuthService>((ref) {
+  return BiometricAuthService();
+});
+
+/// NOV-006: the new domain/repository layer for biometrics, built
+/// alongside — not in place of — [biometricAuthServiceProvider] above.
+/// Nothing reads these providers yet; the 3 existing biometric call sites
+/// (main.dart, login_screen.dart, settings_provider.dart) still use
+/// [biometricAuthServiceProvider] until NOV-007 migrates them.
+final biometricLocalDataSourceProvider = Provider<BiometricLocalDataSource>((ref) {
+  return BiometricLocalDataSource();
+});
+
+final biometricRepositoryProvider = Provider<BiometricRepository>((ref) {
+  return BiometricRepositoryImpl(ref.watch(biometricLocalDataSourceProvider));
 });
