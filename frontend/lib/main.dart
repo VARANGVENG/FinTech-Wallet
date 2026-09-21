@@ -66,6 +66,19 @@ class _StartupGateState extends ConsumerState<_StartupGate> {
   @override
   void initState() {
     super.initState();
+
+    // Captures this State's `ref` for the lifetime of the app: `_StartupGate`
+    // is the root widget under `MaterialApp.home` and is never unmounted by
+    // later `Navigator.push` calls, so this stays valid whenever a
+    // mid-session 401 actually happens, not just during startup.
+    onSessionExpiredHandler = () async {
+      await ref.read(authProvider.notifier).logout();
+      navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
+    };
+
     _isLoggedIn = _resolveInitialRoute();
 
     // Fire-and-forget: requesting notification permission shouldn't block

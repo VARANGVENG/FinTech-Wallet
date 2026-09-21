@@ -33,13 +33,19 @@ final secureStorageProvider = Provider<SecureStorageService>((ref) {
 /// that used to break in `MyApp`'s field initializers (one field reading
 /// another before it was allowed to). Riverpod resolves this dependency
 /// correctly regardless of where each provider is declared.
+/// Set once by `main.dart` (`_StartupGateState.initState`) before the app
+/// does anything else. Lets a mid-session 401 reset auth state and
+/// navigate to `LoginScreen` without this file importing `auth_provider.dart`
+/// or a screen — both already import `core_providers.dart`, so importing
+/// either back here would be circular.
+Future<void> Function()? onSessionExpiredHandler;
+
 final apiClientProvider = Provider<ApiClient>((ref) {
   final secureStorage = ref.watch(secureStorageProvider);
   final authInterceptor = AuthInterceptor(
     secureStorage,
     onSessionExpired: () async {
-      // e.g. navigate to sign-in — wired once a router exists (see the
-      // empty lib/app/router.dart from the earlier audit).
+      await onSessionExpiredHandler?.call();
     },
   );
   return ApiClient(authInterceptor: authInterceptor);
