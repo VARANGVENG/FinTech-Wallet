@@ -1,3 +1,7 @@
 .vscode/
 .idea/
 .dart_tool/
+
+# JVM crash dumps left behind by a Gradle/Kotlin daemon crash (NOV-15)
+hs_err_pid*.log
+replay_pid*.log
