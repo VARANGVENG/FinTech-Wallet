@@ -1,12 +1,15 @@
 import 'package:fintech_wallet/app/main_navigation.dart';
 import 'package:fintech_wallet/core/navigation/navigator_key.dart';
 import 'package:fintech_wallet/core/providers/core_providers.dart';
+import 'package:fintech_wallet/core/services/app_lock_controller.dart';
 import 'package:fintech_wallet/core/services/push_notification_service.dart';
 import 'package:fintech_wallet/core/storage/local_storage_service.dart';
 import 'package:fintech_wallet/features/authentication/presentation/providers/auth_provider.dart';
 import 'package:fintech_wallet/features/authentication/presentation/screen/login_screen.dart';
 import 'package:fintech_wallet/features/authentication/presentation/screen/splash_screen.dart';
 import 'package:fintech_wallet/features/notifications/presentation/provider/notifications_provider.dart';
+import 'package:fintech_wallet/features/settings/presentation/provider/settings_provider.dart';
+import 'package:fintech_wallet/shared/widgets/lock_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +65,7 @@ class _StartupGate extends ConsumerStatefulWidget {
 
 class _StartupGateState extends ConsumerState<_StartupGate> {
   late final Future<bool> _isLoggedIn;
+  late final AppLockController _appLockController;
 
   @override
   void initState() {
@@ -73,11 +77,45 @@ class _StartupGateState extends ConsumerState<_StartupGate> {
     // mid-session 401 actually happens, not just during startup.
     onSessionExpiredHandler = () async {
       await ref.read(authProvider.notifier).logout();
+      // So a re-lock that was pending/active for the session that just
+      // expired doesn't leave AppLockController's state stale relative
+      // to what's actually on screen now.
+      _appLockController.onLockCleared();
       navigatorKey.currentState?.pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const LoginScreen()),
         (route) => false,
       );
     };
+
+    // NOV-18: re-locks the app on resume after >=30s continuously
+    // backgrounded, when biometric login is enabled. `settingsProvider`
+    // is only ever loaded from the Settings screen's own initState, so it
+    // needs an explicit load here too — otherwise `biometricLogin` would
+    // read as its default (false) for anyone who hasn't opened Settings
+    // yet this session.
+    ref.read(settingsProvider.notifier).loadSettings();
+    _appLockController = AppLockController(
+      isBiometricLoginEnabled: () => ref.read(settingsProvider).biometricLogin,
+      // Don't lock a session that's already gone - avoids pushing a
+      // pointless (or, worse, confusing) re-auth prompt on top of
+      // LoginScreen if it expired while backgrounded.
+      isSessionActive: () => ref.read(authProvider).status == AuthStatus.success,
+      onLockRequired: () {
+        final pushed = navigatorKey.currentState?.push(
+          MaterialPageRoute(
+            builder: (_) => LockScreen(
+              onReauthenticated: _appLockController.onReauthenticated,
+              onLockCleared: _appLockController.onLockCleared,
+            ),
+          ),
+        );
+        // If there's no attached Navigator right now, nothing was shown -
+        // clear the guard instead of leaving it stuck locked forever.
+        if (pushed == null) _appLockController.onLockCleared();
+      },
+    );
+    guardNavigation = _appLockController.runOrDeferWhenUnlocked;
+    WidgetsBinding.instance.addObserver(_appLockController);
 
     _isLoggedIn = _resolveInitialRoute();
 
@@ -87,6 +125,12 @@ class _StartupGateState extends ConsumerState<_StartupGate> {
       onForegroundMessage: (notification) =>
           ref.read(notificationsProvider.notifier).addPushNotification(notification),
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(_appLockController);
+    super.dispose();
   }
 
   Future<bool> _resolveInitialRoute() async {
