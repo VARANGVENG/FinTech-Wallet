@@ -40,8 +40,15 @@ class TopUpController extends Controller
 
         // Fast path: this exact attempt was already processed (a retried
         // request, a double-tap the client didn't fully block). Return the
-        // original result instead of doing the work again.
-        $existing = Transaction::where('idempotency_key', $idempotencyKey)->first();
+        // original result instead of doing the work again. Scoped by type
+        // and to the requesting user's own wallets — otherwise a key
+        // collision with a DIFFERENT user's top-up (a replay, a guess, or a
+        // genuine UUID collision) would return THEIR transaction here and
+        // silently skip crediting this user's own wallet entirely.
+        $existing = Transaction::where('idempotency_key', $idempotencyKey)
+            ->where('type', 'topup')
+            ->whereHas('wallet', fn ($query) => $query->where('user_id', $request->user()->id))
+            ->first();
         if ($existing) {
             return response()->json([
                 'transaction' => new TransactionResource($existing),
@@ -77,7 +84,10 @@ class TopUpController extends Controller
             // balance increment — rolls back automatically. Return the
             // winner's result instead of surfacing an error.
             if ((int) ($e->errorInfo[1] ?? 0) === 1062) {
-                $existing = Transaction::where('idempotency_key', $idempotencyKey)->firstOrFail();
+                $existing = Transaction::where('idempotency_key', $idempotencyKey)
+                    ->where('type', 'topup')
+                    ->whereHas('wallet', fn ($query) => $query->where('user_id', $request->user()->id))
+                    ->firstOrFail();
                 return response()->json([
                     'transaction' => new TransactionResource($existing),
                 ]);

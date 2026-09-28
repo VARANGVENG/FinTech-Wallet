@@ -1,3 +1,4 @@
+import 'package:fintech_wallet/core/services/app_lock_controller.dart';
 import 'package:fintech_wallet/features/notifications/data/datasource/device_token_remote_datasource.dart';
 import 'package:fintech_wallet/features/notifications/data/model/app_notification.dart';
 import 'package:fintech_wallet/features/notifications/presentation/screen/notifications_screen.dart';
@@ -175,10 +176,17 @@ class PushNotificationService {
     // (see lib/app/router.dart, and every other screen navigates via plain
     // Navigator.push rather than named routes), and building that is out
     // of scope here.
-    _navigatorKey.currentState?.push(
-      MaterialPageRoute(
-        builder: (_) => NotificationsScreen(initialTabIndex: tabIndex),
-      ),
-    );
+    //
+    // Routed through guardNavigation (NOV-18) so a notification tap that
+    // resumes the app can't push authenticated content on top of an
+    // active biometric re-lock - it's deferred until the lock resolves,
+    // or dropped if it resolves via logout instead.
+    guardNavigation(() {
+      _navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (_) => NotificationsScreen(initialTabIndex: tabIndex),
+        ),
+      );
+    });
   }
 }
