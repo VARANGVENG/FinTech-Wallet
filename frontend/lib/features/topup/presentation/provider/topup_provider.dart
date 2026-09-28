@@ -115,7 +115,7 @@ class TopUpNotifier extends StateNotifier<TopUpState> {
   Future<Transaction?> submit() async {
     if (state.selectedMethod == null) return null;
 
-    state = state.copyWith(submitting: false, errorMessage: null);
+    state = state.copyWith(submitting: true, errorMessage: null);
 
     try {
       final transaction = await _repository.submitTopUp(
@@ -124,9 +124,10 @@ class TopUpNotifier extends StateNotifier<TopUpState> {
         method: state.selectedMethod!,
         idempotencyKey: state.idempotencyKey,
       );
+      state = state.copyWith(submitting: false);
       return transaction;
     } on ApiException catch (e) {
-      state = state.copyWith(errorMessage: e.message);
+      state = state.copyWith(submitting: false, errorMessage: e.message);
       return null;
     }
   }
