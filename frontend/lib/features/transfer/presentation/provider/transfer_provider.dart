@@ -81,7 +81,7 @@ class TransferNotifier extends StateNotifier<TransferState> {
     final recipient = state.recipient;
     if (recipient == null || state.amount <= 0) return null;
 
-    state = state.copyWith(submitting: false, errorMessage: null);
+    state = state.copyWith(submitting: true, errorMessage: null);
 
     try {
       final transaction = await _repository.submitTransfer(
@@ -94,7 +94,7 @@ class TransferNotifier extends StateNotifier<TransferState> {
       state = state.copyWith(submitting: false);
       return transaction;
     } on ApiException catch (e) {
-      state = state.copyWith(errorMessage: e.message);
+      state = state.copyWith(submitting: false, errorMessage: e.message);
       return null;
     }
   }
