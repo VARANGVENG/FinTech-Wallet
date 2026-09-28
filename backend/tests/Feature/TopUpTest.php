@@ -194,6 +194,49 @@ class TopUpTest extends TestCase
     }
 
     /**
+     * NOV-21 cross-user isolation check. The idempotency pre-check in
+     * TopUpController::store() is Transaction::where('idempotency_key', ...)
+     * with no 'type' filter and no scoping to the requesting user at all —
+     * strictly less scoped than TransferController's equivalent. If Bob's
+     * request reuses a key Alice already used, the secure behaviour is for
+     * Bob's own top-up to go through as a normal first-time request.
+     * Anything else means Bob's response carries Alice's transaction, and
+     * Bob's own wallet is never actually credited.
+     */
+    public function test_user_b_reusing_user_as_idempotency_key_gets_their_own_topup_not_user_as(): void
+    {
+        $alice = User::factory()->create();
+        Wallet::factory()->for($alice)->create(['currency' => 'USD', 'balance' => 0, 'is_default' => true]);
+
+        $key = (string) Str::uuid();
+
+        Sanctum::actingAs($alice);
+        $aliceResponse = $this->postJson('/api/v1/topups', [
+            'amount' => 40.00,
+            'currency' => 'USD',
+            'method' => 'linkedBank',
+            'idempotency_key' => $key,
+        ]);
+        $aliceResponse->assertStatus(201);
+        $aliceTransactionId = $aliceResponse->json('transaction.id');
+
+        $bob = User::factory()->create();
+        $bobWallet = Wallet::factory()->for($bob)->create(['currency' => 'USD', 'balance' => 0, 'is_default' => true]);
+
+        Sanctum::actingAs($bob);
+        $bobResponse = $this->postJson('/api/v1/topups', [
+            'amount' => 40.00,
+            'currency' => 'USD',
+            'method' => 'linkedBank',
+            'idempotency_key' => $key,
+        ]);
+
+        $bobResponse->assertStatus(201);
+        $this->assertNotEquals($aliceTransactionId, $bobResponse->json('transaction.id'));
+        $this->assertEquals(40.00, $bobWallet->fresh()->balance, 'Bob\'s own top-up must actually execute, not be short-circuited by Alice\'s key.');
+    }
+
+    /**
      * This is the actual H.1 investigation. A genuinely concurrent race
      * (two requests both passing the pre-check before either commits)
      * can't be deterministically reproduced in a single-threaded,
