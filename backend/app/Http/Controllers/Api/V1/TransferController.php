@@ -42,9 +42,13 @@ class TransferController extends Controller
         // Fast path: this exact attempt was already processed. Only the
         // transfer_out row needs checking — it and its transfer_in sibling
         // are created together inside one DB::transaction below, so if one
-        // exists, both do.
+        // exists, both do. Scoped to the sender's own wallets — otherwise a
+        // key collision with a DIFFERENT user's transfer (a replay, a guess,
+        // or a genuine UUID collision) would return THEIR transaction here
+        // instead of ever attempting this sender's own.
         $existing = Transaction::where('idempotency_key', $idempotencyKey)
             ->where('type', 'transfer_out')
+            ->whereHas('wallet', fn ($query) => $query->where('user_id', $sender->id))
             ->first();
         if ($existing) {
             return response()->json([
@@ -120,6 +124,7 @@ class TransferController extends Controller
             if ((int) ($e->errorInfo[1] ?? 0) === 1062) {
                 $existing = Transaction::where('idempotency_key', $idempotencyKey)
                     ->where('type', 'transfer_out')
+                    ->whereHas('wallet', fn ($query) => $query->where('user_id', $sender->id))
                     ->firstOrFail();
                 return response()->json([
                     'transaction' => new TransactionResource($existing),
