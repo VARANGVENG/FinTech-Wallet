@@ -5,12 +5,9 @@ import '../../domain/entities/biometric_attempt_result.dart';
 import '../../domain/entities/biometric_capability.dart';
 
 /// Wraps `local_auth` directly — the only file in the app that needs to
-/// know its platform-specific exception codes. Mirrors
-/// `core/services/biometric_auth_service.dart`'s existing shape
-/// (constructor-injectable [LocalAuthentication], same
-/// `AuthenticationOptions`), but classifies failures instead of collapsing
-/// everything to a bool. `BiometricAuthService` itself is untouched and
-/// still in use by the app until NOV-007 migrates its callers here.
+/// know its platform-specific exception codes. Classifies failures into a
+/// typed [BiometricAttemptResult] instead of collapsing everything to a
+/// bool, which the now-removed `BiometricAuthService` used to do.
 ///
 /// Exception mapping verified against the actually-installed
 /// `local_auth 2.3.0` / `local_auth_android 1.0.56` /
@@ -41,10 +38,8 @@ class BiometricLocalDataSource {
 
   /// Combines `canCheckBiometrics` (hardware capable, regardless of
   /// enrollment) with `isDeviceSupported()` (hardware capable OR able to
-  /// fail over to device credentials) — the same two calls
-  /// `BiometricAuthService.isAvailable` already makes, now with
-  /// `getAvailableBiometrics()` added on top to distinguish "no hardware"
-  /// from "hardware present, nothing enrolled".
+  /// fail over to device credentials), plus `getAvailableBiometrics()` to
+  /// distinguish "no hardware" from "hardware present, nothing enrolled".
   ///
   /// On Windows, `getAvailableBiometrics()` doesn't query real enrollment
   /// state — `local_auth_windows` returns a fixed non-empty list whenever
@@ -67,9 +62,8 @@ class BiometricLocalDataSource {
     }
   }
 
-  /// Prompts the OS biometric UI. `biometricOnly: true` and
-  /// `stickyAuth: true` match `BiometricAuthService.authenticate` exactly —
-  /// unchanged behavior, not a new choice made here.
+  /// Prompts the OS biometric UI with `biometricOnly: true` and
+  /// `stickyAuth: true`.
   Future<BiometricAttemptResult> authenticate(String reason) async {
     try {
       final success = await _localAuth.authenticate(

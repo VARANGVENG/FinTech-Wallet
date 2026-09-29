@@ -3,9 +3,9 @@ import '../entities/biometric_capability.dart';
 
 /// Domain-facing contract for biometric authentication. Implemented by
 /// `BiometricRepositoryImpl`, which simply forwards to
-/// `BiometricLocalDataSource` — the two methods here mirror exactly what
-/// `BiometricAuthService` already exposes (`isAvailable`, `authenticate`),
-/// just with richer, source-verified return types in place of a bare bool.
+/// `BiometricLocalDataSource`. Read directly by `LockScreen` — no separate
+/// use-case layer, matching how every other feature in this app calls its
+/// repository directly from its provider/notifier.
 abstract class BiometricRepository {
   /// Whether this device can currently be prompted for biometrics.
   Future<BiometricCapability> checkCapability();
