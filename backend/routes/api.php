@@ -23,7 +23,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/payment-methods', [TopUpController::class, 'methods'])->middleware('auth:sanctum');
     Route::post('/topups', [TopUpController::class, 'store'])->middleware('auth:sanctum');
 
-    Route::get('/users/search', [UserController::class, 'search'])->middleware('auth:sanctum');
+    Route::get('/users/search', [UserController::class, 'search'])->middleware(['auth:sanctum', 'throttle:user-search']);
     Route::post('/transfers', [TransferController::class, 'store'])->middleware('auth:sanctum');
 
     Route::post('/device-tokens', [DeviceTokenController::class, 'store'])->middleware('auth:sanctum');

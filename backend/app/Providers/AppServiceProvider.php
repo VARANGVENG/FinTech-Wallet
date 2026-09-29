@@ -69,5 +69,12 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', function ($request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+
+        // Tighter than the general 'api' limit (60/min) - recipient search
+        // by exact email is an enumeration vector (NOV-22), and no
+        // legitimate usage needs anywhere near 10 lookups/minute.
+        RateLimiter::for('user-search', function ($request) {
+            return Limit::perMinute(10)->by($request->user()?->id ?: $request->ip());
+        });
     }
 }
