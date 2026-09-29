@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class RateLimitingTest extends TestCase
@@ -86,6 +87,25 @@ class RateLimitingTest extends TestCase
 
         $this->withHeader('Authorization', "Bearer {$token}")
             ->getJson('/api/v1/me')
+            ->assertStatus(429);
+    }
+
+    public function test_user_search_is_throttled_after_ten_requests_per_minute_tighter_than_the_general_api_limit(): void
+    {
+        $requester = User::factory()->create();
+        $target = User::factory()->create(['email' => 'target@example.com']);
+        Sanctum::actingAs($requester);
+
+        for ($i = 0; $i < 10; $i++) {
+            $this->getJson('/api/v1/users/search?email='.$target->email)
+                ->assertStatus(200);
+        }
+
+        // The 11th search within the same minute is throttled by the
+        // tighter 'user-search' limiter (10/min), well before the general
+        // 'api' limiter (60/min) would ever kick in - proving the new
+        // named limiter is the one actually doing the blocking here.
+        $this->getJson('/api/v1/users/search?email='.$target->email)
             ->assertStatus(429);
     }
 }
