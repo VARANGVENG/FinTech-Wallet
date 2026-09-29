@@ -7,6 +7,7 @@ use App\Models\User;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Google\Auth\HttpHandler\HttpHandlerFactory;
 use GuzzleHttp\Client;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -119,9 +120,14 @@ class PushNotificationService
             // most likely a DB error on the token lookup/prune queries. Logged
             // at `error`, not `warning`, since this is a genuine bug worth
             // investigating rather than an expected external-service hiccup.
+            // QueryException::getMessage() embeds the fully-interpolated SQL
+            // (including bound values) by Laravel convention (NOV-42) - since
+            // the queries here touch device tokens, that could put one in the
+            // log. Only its class name is logged; every other Throwable's
+            // message is safe to log as-is.
             Log::error('Unexpected failure while sending a push notification.', [
                 'user_id' => $user->id,
-                'error' => $e->getMessage(),
+                'error' => $e instanceof QueryException ? $e::class : $e->getMessage(),
             ]);
         }
     }
