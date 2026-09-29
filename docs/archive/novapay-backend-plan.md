@@ -1,3 +1,11 @@
+> **⚠️ ARCHIVED — historical only, not accurate as of 2026-09-29 (NOV-14).**
+>
+> This was an early planning spec for a Laravel backend, written before any backend code existed, and the real implementation diverged substantially from it. Notably: there is no `cards`, `linked_accounts`, `disputes`, `documents`, or `notification_settings` table; no dashboard/withdraw/2FA/PIN-change/forgot-password endpoints; and the real `wallets`/`transactions` schema uses a single `balance` field with idempotency-key-based safe retries, not the `balance_available`/`balance_pending` split or `reference`/`merchant`/`category`/`flagged` columns described below. Real endpoints live under `/api/v1/...` (Auth, Wallets, Transactions, Top-ups, Transfers, User search, Device tokens), not the `/api/...` paths shown here.
+>
+> Kept only for historical context on the project's earliest planning. For the actual current backend, see `backend/routes/api.php`, `backend/database/migrations/`, and `docs/ARCHITECTURE_AUDIT.md`.
+
+---
+
 # NovaPay Laravel Backend — Full Build Plan
 
 This plan maps every screen you shared to concrete database tables and API endpoints, so when we start coding, we're implementing a spec instead of guessing as we go.

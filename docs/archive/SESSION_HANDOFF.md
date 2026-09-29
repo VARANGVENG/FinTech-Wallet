@@ -1,3 +1,11 @@
+> **⚠️ ARCHIVED — historical only, not accurate as of 2026-09-29 (NOV-14).**
+>
+> This document describes the project as of 2026-08-07, when it was a **frontend-only prototype** with zero real backend integration. That is no longer true: a real Laravel/Sanctum/MySQL backend exists and is wired up end-to-end (Auth, Wallet, Transfer, Top-up, Transactions, Device Tokens, Push Notifications), token persistence works, CI runs both frontend analysis/tests and real backend feature tests against a live MySQL service container, and the feature list, file structure, and "Remaining Tasks" below are all substantially out of date. Section 11's "Development Rules" (strict never-auto-apply-changes mentor mode) have also since been explicitly superseded by sustained, owner-approved practice.
+>
+> Kept only for historical context on the project's earliest design decisions and rationale. For current architecture, see `docs/ARCHITECTURE_AUDIT.md` and the other files in `docs/`; for current task status, see the live Notion Tasks board.
+
+---
+
 # NovaPay (fintech_wallet) — Session Handoff
 
 **Branch:** `feature/topup`
