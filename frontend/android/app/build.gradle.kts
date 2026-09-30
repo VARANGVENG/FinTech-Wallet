@@ -39,7 +39,18 @@ android {
         applicationId = "com.fintech.wallet"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // Deliberately 24, not flutter.minSdkVersion (NOV-35) - this happens
+        // to be Flutter's own current default too, but hardcoding it means a
+        // future Flutter upgrade can't silently lower this app's real floor.
+        // 24 is a hard requirement of local_auth_android and
+        // flutter_local_notifications (both declare minSdkVersion 24 in
+        // their own build.gradle) - going lower would fail to build once
+        // either plugin's native code is actually compiled in, not just at
+        // Dart-analysis time. Google Play has no minSdkVersion policy floor
+        // of its own to satisfy here - its review requirement is about
+        // targetSdk, which already tracks "latest stable" via
+        // flutter.targetSdkVersion below.
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
